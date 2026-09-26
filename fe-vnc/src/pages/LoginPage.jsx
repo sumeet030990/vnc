@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import {
@@ -20,7 +21,8 @@ import { alpha } from '@mui/material/styles'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { useLogin, useLoginUsers } from '../api/auth.js'
-import loginBg from '../assets/login-bg.jpeg'
+import { useAuth } from '../auth/authContext.js'
+import loginBg from '../assets/login-bg.png'
 
 // Bundled by Vite — replace src/assets/login-bg.avif to change it.
 const BACKGROUND_IMAGE = loginBg
@@ -32,22 +34,41 @@ const validationSchema = yup.object({
 })
 
 function LoginPage() {
-  const handleSubmit = (values) =>
-    login.mutateAsync(values).then(() => {
-      // Error is shown from login.error; keep the form usable.
-    })
   const [showPassword, setShowPassword] = useState(false)
   const users = useLoginUsers()
   const login = useLogin()
+  const auth = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  // Send the user back to the page they tried to open, else the dashboard.
+  const redirectTo = location.state?.from?.pathname ?? '/dashboard'
+
+  const handleSubmit = (values) => {
+    navigate(redirectTo, { replace: true })
+
+    // login
+    //   .mutateAsync(values)
+    //   .then((user) => {
+    //     auth.login(user)
+    //     navigate(redirectTo, { replace: true })
+    //   })
+    //   .catch(() => {
+    //     // Error is shown from login.error; keep the form usable.
+    //   })
+  }
 
   const formik = useFormik({
     initialValues: { userId: '', password: '' },
-    validationSchema,
+    // validationSchema,
     onSubmit: handleSubmit,
   })
 
   const fieldError = (name) =>
     formik.touched[name] && formik.errors[name] ? formik.errors[name] : ''
+
+  if (auth.isAuthenticated) {
+    return <Navigate to={redirectTo} replace />
+  }
 
   return (
     <Box
@@ -58,7 +79,7 @@ function LoginPage() {
         justifyContent: 'center',
         px: 2,
         bgcolor: 'primary.dark',
-        // Indigo overlay on top of the image keeps the card easy to read.
+        // Navy-to-gold overlay on top of the image keeps the card easy to read.
         backgroundImage: (theme) =>
           `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.75)}, ${alpha(theme.palette.secondary.dark, 0.55)}), url(${BACKGROUND_IMAGE})`,
         backgroundSize: 'cover',

@@ -1,8 +1,21 @@
 ## UI/Theme Guidelines
 
+- **Design mindset (always)**: Every page must look **premium and clean**. Before building any page or component, ask: "Does this feel like a polished, high-end SaaS product?"
+  - Generous white space; don't crowd the screen.
+  - Few colors: neutrals first, gold only as a small accent.
+  - Clear visual hierarchy; one main action per section.
+  - Consistent spacing, alignment, and rounded corners across pages.
+  - Subtle shadows and animations only — nothing loud or flashy.
+  - Remove anything that doesn't help the user (extra borders, icons, text).
 - **Style**: Clean, minimal design with elevated 3D-style cards (soft shadows, subtle depth, rounded corners) and smooth micro-animations on hover/load (use MUI's `Fade`, `Grow`, or `framer-motion` for transitions).
 - **Mode**: Light theme only — no dark mode toggle needed.
-- **Primary color**: Indigo (`#3F51B5` or MUI's `indigo[600]`) as primary, with a soft teal (`#26A69A`) as secondary accent for highlights/CTAs.
+- **Colors** (Neutral + Gold Accent — premium SaaS/dashboard feel; defined in `src/theme.js`):
+  - **Primary**: Charcoal Navy `#1E2A32` (alt: Slate `#2C3639`) — app bar, buttons, shadows, dividers; white text on top.
+  - **Secondary/Accent**: Gold `#C9A227` (brand) — highlights/CTAs; use dark navy text on gold, not white.
+  - **Background**: Soft Cream `#FAF7F0` (alt: Off-white `#F8F8F5`).
+  - **Surface**: White `#FFFFFF` for cards and panels.
+  - **Text**: `#2B2B2B` primary; secondary text is the same color at 70% opacity.
+  - No green in UI chrome — gold + neutrals carry the branding.
 - **Layout**: Top bar only (no sidebar) — use MUI `AppBar` with navigation tabs/menu items inline; content area is full-width below the bar.
 - **Cards**: Use `Card` with `elevation={3}` or custom `boxShadow`, `borderRadius: 12px`, hover effect scaling slightly (`transform: scale(1.02)`) with transition.
 - **Typography**: Rely on MUI's default Roboto with clear hierarchy (h5/h6 for card titles, body2 for meta info).

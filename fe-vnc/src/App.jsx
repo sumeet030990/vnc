@@ -1,26 +1,27 @@
-import { useState } from 'react'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Navigate, Route, Routes } from 'react-router'
+import RequireAuth from './auth/RequireAuth.jsx'
+import AppLayout from './layouts/AppLayout.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
+import ComingSoonPage from './pages/ComingSoonPage.jsx'
 
 function App() {
-  const [user, setUser] = useState(null)
-
-  if (!user) {
-    return <LoginPage onLogin={setUser} />
-  }
-
-  // Placeholder until the next page is built.
   return (
-    <Box sx={{ p: 4 }}>
-      <Stack spacing={2} alignItems="flex-start">
-        <Typography variant="h5" component="h1">
-          Welcome, {user.name}
-        </Typography>
-        <Button variant="outlined" onClick={() => setUser(null)}>
-          Log out
-        </Button>
-      </Stack>
-    </Box>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Everything inside here needs a logged-in user. */}
+      <Route element={<RequireAuth />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/users" element={<ComingSoonPage title="Users" />} />
+          <Route path="/roles" element={<ComingSoonPage title="Roles" />} />
+          <Route path="/items" element={<ComingSoonPage title="Items" />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   )
 }
 
