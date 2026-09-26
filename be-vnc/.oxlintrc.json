@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "node"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "ignorePatterns": ["dist", "src/generated"],
+  "rules": {
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": ["dotenv/config"]
+      }
+    ]
+  }
+}
