@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, useNavigate } from 'react-router'
+import { NavLink, Outlet, useNavigate } from 'react-router'
 import {
   AppBar,
   Avatar,
@@ -14,8 +14,10 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import Logout from '@mui/icons-material/Logout'
 import { useAuth } from '../auth/useAuth.js'
+import { NAV_ITEMS } from './navItems.js'
 
 const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'App'
 
@@ -48,13 +50,65 @@ function AppLayout() {
             variant="h6"
             component="a"
             href="/"
-            sx={{ mr: 3, color: 'inherit', textDecoration: 'none' }}
+            sx={{
+              mr: 3,
+              color: 'inherit',
+              textDecoration: 'none',
+              // Small screens: hide the name so the page links fit.
+              display: { xs: 'none', md: 'block' },
+            }}
             noWrap
           >
             {APP_NAME}
           </Typography>
 
-          <Box sx={{ flexGrow: { xs: 1, md: 0 } }}>
+          <Box
+            component="nav"
+            aria-label="Main"
+            sx={{
+              display: 'flex',
+              gap: 0.5,
+              flex: 1,
+              minWidth: 0,
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {NAV_ITEMS.map(({ to, label }) => (
+              <Button
+                key={to}
+                component={NavLink}
+                to={to}
+                sx={(t) => ({
+                  position: 'relative',
+                  flexShrink: 0,
+                  px: 1.75,
+                  color: alpha(t.palette.common.white, 0.7),
+                  fontWeight: 500,
+                  '&:hover': {
+                    color: 'common.white',
+                    bgcolor: alpha(t.palette.common.white, 0.06),
+                  },
+                  // Gold underline marks the current page.
+                  '&.active': { color: 'common.white' },
+                  '&.active::after': {
+                    content: '""',
+                    position: 'absolute',
+                    left: 14,
+                    right: 14,
+                    bottom: 2,
+                    height: 2,
+                    borderRadius: 2,
+                    bgcolor: 'secondary.main',
+                  },
+                })}
+              >
+                {label}
+              </Button>
+            ))}
+          </Box>
+
+          <Box sx={{ flexShrink: 0 }}>
             <Button
               color="inherit"
               onClick={(e) => setUserAnchor(e.currentTarget)}

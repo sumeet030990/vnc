@@ -36,6 +36,7 @@ export async function updateUser(req: Request, res: Response) {
 }
 
 export async function deleteUser(req: Request, res: Response) {
-  await userService.deleteUser(getId(req))
+  // requireAuth runs first on these routes, so req.user is always set.
+  await userService.deleteUser(getId(req), req.user!.id)
   sendSuccess(res, null, { message: 'User deleted' })
 }

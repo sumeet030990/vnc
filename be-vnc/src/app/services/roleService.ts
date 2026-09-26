@@ -14,3 +14,8 @@ export async function ensureRoleExists(roleId?: number) {
     throw new HttpError(400, 'Role does not exist')
   }
 }
+
+// Options for the role dropdowns in the UI.
+export function listRoles() {
+  return roleRepository.findRoles()
+}

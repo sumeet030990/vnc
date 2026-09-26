@@ -138,7 +138,11 @@ export async function updateUser(
   })
 }
 
-export async function deleteUser(id: number) {
+export async function deleteUser(id: number, currentUserId: number) {
+  if (id === currentUserId) {
+    throw new HttpError(400, 'You cannot delete your own account')
+  }
+
   const existing = await userRepository.findUserById(id)
   if (!existing) {
     throw new HttpError(404, 'User not found')

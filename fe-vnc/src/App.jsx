@@ -4,6 +4,7 @@ import AppLayout from './layouts/AppLayout.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
+import UsersPage from './pages/users/UsersPage.jsx'
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/users" element={<ComingSoonPage title="Users" />} />
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<ComingSoonPage title="Roles" />} />
           <Route path="/items" element={<ComingSoonPage title="Items" />} />
         </Route>

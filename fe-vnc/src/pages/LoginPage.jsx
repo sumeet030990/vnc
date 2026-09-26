@@ -100,7 +100,7 @@ function LoginPage() {
         >
           <CardContent sx={{ p: 4 }}>
             <Stack spacing={3} component="form" onSubmit={formik.handleSubmit}>
-              <Stack alignItems="center" spacing={1}>
+              <Stack spacing={1} sx={{ alignItems: 'center' }}>
                 <Typography variant="h5" component="h1">
                   {APP_NAME}
                 </Typography>

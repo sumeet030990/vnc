@@ -50,9 +50,8 @@ function WelcomeHeader({ user }) {
       <Stack
         direction="row"
         spacing={1.5}
-        alignItems="center"
         useFlexGap
-        flexWrap="wrap"
+        sx={{ alignItems: 'center', flexWrap: 'wrap' }}
       >
         <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
           {greeting()}, {user?.name}
@@ -75,8 +74,7 @@ function StatCard({ label, icon: Icon, value, isPending }) {
       <CardContent sx={{ p: 3 }}>
         <Stack
           direction="row"
-          justifyContent="space-between"
-          alignItems="flex-start"
+          sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}
         >
           <Typography variant="body2" color="text.secondary">
             Total {label.toLowerCase()}
@@ -105,7 +103,7 @@ function QuickLinkCard({ to, label, icon: Icon, description }) {
     <Card sx={{ height: '100%' }}>
       <CardActionArea component={RouterLink} to={to} sx={{ height: '100%' }}>
         <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <Avatar variant="rounded" sx={iconTileSx}>
               <Icon />
             </Avatar>
