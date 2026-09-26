@@ -1,0 +1,53 @@
+{
+  "name": "vnc-desktop",
+  "productName": "VNC",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Desktop app for VNC",
+  "main": "main.js",
+  "scripts": {
+    "build:app": "npm --prefix ../be-vnc run build && npm --prefix ../fe-vnc run build:desktop && node scripts/prepare-backend.js",
+    "start": "npm run build:app && electron .",
+    "dev": "electron . --dev",
+    "pack": "npm run build:app && electron-builder --dir",
+    "dist": "npm run build:app && electron-builder"
+  },
+  "build": {
+    "appId": "com.vnc.desktop",
+    "productName": "VNC",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/backend",
+        "to": "backend"
+      },
+      {
+        "from": "build/backend/node_modules",
+        "to": "backend/node_modules"
+      },
+      {
+        "from": "../fe-vnc/dist",
+        "to": "frontend"
+      }
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "electron": "44.4.5",
+    "electron-builder": "26.15.3"
+  }
+}
