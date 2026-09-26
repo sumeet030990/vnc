@@ -25,14 +25,16 @@ CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `roleId` INTEGER NOT NULL,
     `name` VARCHAR(191) NULL,
-    `mobile_no` VARCHAR(191) NOT NULL,
+    `mobile_no` VARCHAR(191) NULL,
     `address` VARCHAR(191) NULL,
     `city` VARCHAR(191) NULL,
     `allow_login` BOOLEAN NOT NULL DEFAULT false,
+    `user_name` VARCHAR(191) NULL,
     `password` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    UNIQUE INDEX `User_user_name_key`(`user_name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

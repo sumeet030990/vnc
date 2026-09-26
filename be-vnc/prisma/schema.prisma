@@ -26,15 +26,16 @@ model Role {
 
 // Example model — replace with your own
 model User {
-  id        Int      @id @default(autoincrement())
-  roleId    Int
-  role      Role     @relation(fields: [roleId], references: [id])
-  name      String?
-  mobile_no String
-  address   String?
-  city      String?
+  id          Int      @id @default(autoincrement())
+  roleId      Int
+  role        Role     @relation(fields: [roleId], references: [id])
+  name        String?
+  mobile_no   String?
+  address     String?
+  city        String?
   allow_login Boolean  @default(false)
-  password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user_name   String?  @unique
+  password    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

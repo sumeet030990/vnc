@@ -37,10 +37,12 @@ curl http://localhost:4000/api/health
 
 Set these in `.env`, which is git-ignored. Never commit real values.
 
-| Variable       | Required | Default | Description                                                         |
-| -------------- | -------- | ------- | ------------------------------------------------------------------- |
-| `PORT`         | No       | `4000`  | Port the HTTP server listens on                                     |
-| `DATABASE_URL` | Yes      | —       | MySQL connection string: `mysql://USER:PASSWORD@HOST:3306/DATABASE` |
+| Variable         | Required | Default | Description                                                         |
+| ---------------- | -------- | ------- | ------------------------------------------------------------------- |
+| `PORT`           | No       | `4000`  | Port the HTTP server listens on                                     |
+| `DATABASE_URL`   | Yes      | —       | MySQL connection string: `mysql://USER:PASSWORD@HOST:3306/DATABASE` |
+| `JWT_SECRET`     | Yes      | —       | Secret used to sign login tokens. Use a long random string          |
+| `JWT_EXPIRES_IN` | No       | `1d`    | How long a login token stays valid (e.g. `8h`, `7d`)                |
 
 Use the `mysql://` form of `DATABASE_URL`. The Prisma CLI reads it as-is, and [src/lib/prisma.ts](src/lib/prisma.ts) converts it into the config the MariaDB driver adapter needs at runtime.
 

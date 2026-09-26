@@ -9,6 +9,7 @@ const userSelect = {
   address: true,
   city: true,
   allow_login: true,
+  user_name: true,
   createdAt: true,
   updatedAt: true,
   role: { select: { id: true, name: true, slug: true } },
@@ -22,9 +23,12 @@ export function findLoginUsers(db: DbClient = prisma) {
   })
 }
 
-export function findLoginUserById(id: number, db: DbClient = prisma) {
+export function findLoginUserByUserName(
+  userName: string,
+  db: DbClient = prisma,
+) {
   return db.user.findFirst({
-    where: { id, allow_login: true },
+    where: { user_name: userName, allow_login: true },
     include: { role: true },
   })
 }
@@ -59,7 +63,14 @@ export function findUserById(id: number, db: DbClient = prisma) {
 export function findUserLoginStateById(id: number, db: DbClient = prisma) {
   return db.user.findUnique({
     where: { id },
-    select: { id: true, allow_login: true, password: true },
+    select: { id: true, allow_login: true, user_name: true, password: true },
+  })
+}
+
+export function findUserIdByUserName(userName: string, db: DbClient = prisma) {
+  return db.user.findUnique({
+    where: { user_name: userName },
+    select: { id: true },
   })
 }
 

@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { requireAuth } from '../app/middlewares/auth'
 import * as userController from '../app/controllers/userController'
 import {
   validateBody,
@@ -15,7 +16,9 @@ import {
 
 const router = Router()
 
-// TODO: open to anyone for now — protect once login issues a token.
+// Every route below needs a logged-in user.
+router.use(requireAuth)
+
 router.get('/', validateQuery(listUsersQuerySchema), userController.listUsers)
 router.get('/:id', validateParams(userIdParamsSchema), userController.getUser)
 router.post('/', validateBody(createUserSchema), userController.createUser)

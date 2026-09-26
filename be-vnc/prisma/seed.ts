@@ -20,6 +20,7 @@ const users = [
     address: '',
     city: 'Nagpur',
     allow_login: true,
+    user_name: 'sumeet',
     password: 'password',
   },
   {
@@ -29,6 +30,7 @@ const users = [
     address: '',
     city: 'Nagpur',
     allow_login: true,
+    user_name: 'deepak',
     password: 'password',
   },
   {
@@ -38,6 +40,7 @@ const users = [
     address: '',
     city: 'Nagpur',
     allow_login: true,
+    user_name: 'swapnil',
     password: 'password',
   },
   {
@@ -47,6 +50,7 @@ const users = [
     address: '',
     city: 'Nagpur',
     allow_login: true,
+    user_name: 'ayush',
     password: 'password',
   },
   {

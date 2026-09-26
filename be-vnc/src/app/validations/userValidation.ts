@@ -21,6 +21,15 @@ const mobileNo = z
 
 const allowLogin = z.boolean({ error: 'Allow login must be true or false' })
 
+const userName = z
+  .string({ error: 'Username must be text' })
+  .trim()
+  .regex(/^[A-Za-z0-9._-]{3,50}$/, {
+    error:
+      'Username must be 3 to 50 letters, numbers, dots, dashes or underscores',
+  })
+  .nullable()
+
 const password = z
   .string({ error: 'Password must be text' })
   .min(1, { error: 'Password cannot be empty' })
@@ -62,6 +71,7 @@ export const createUserSchema = z.object({
   address: optionalText('Address').optional(),
   city: optionalText('City').optional(),
   allow_login: allowLogin.optional(),
+  user_name: userName.optional(),
   password: password.optional(),
 })
 
@@ -74,6 +84,7 @@ export const replaceUserSchema = z.object({
   address: optionalText('Address'),
   city: optionalText('City'),
   allow_login: allowLogin,
+  user_name: userName,
   password: password.optional(),
 })
 
