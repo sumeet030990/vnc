@@ -16,13 +16,13 @@ routes -> controllers -> services -> repositories -> database
 
 ## 2. Files and naming
 
-| Layer      | Folder              | Grouped by | File name                | Example             |
-| ---------- | ------------------- | ---------- | ------------------------ | ------------------- |
-| Route      | `src/routes/`       | feature    | `<feature>Routes.ts`     | `authRoutes.ts`     |
-| Controller | `src/controllers/`  | feature    | `<feature>Controller.ts` | `authController.ts` |
-| Service    | `src/services/`     | table      | `<table>Service.ts`      | `userService.ts`    |
-| Repository | `src/repositories/` | table      | `<table>Repository.ts`   | `userRepository.ts` |
-| Validation | `src/validations/`  | feature    | `<feature>Validation.ts` | `authValidation.ts` |
+| Layer      | Folder                  | Grouped by | File name                | Example             |
+| ---------- | ----------------------- | ---------- | ------------------------ | ------------------- |
+| Route      | `src/routes/`           | feature    | `<feature>Routes.ts`     | `authRoutes.ts`     |
+| Controller | `src/app/controllers/`  | feature    | `<feature>Controller.ts` | `authController.ts` |
+| Service    | `src/app/services/`     | table      | `<table>Service.ts`      | `userService.ts`    |
+| Repository | `src/app/repositories/` | table      | `<table>Repository.ts`   | `userRepository.ts` |
+| Validation | `src/app/validations/`  | feature    | `<feature>Validation.ts` | `authValidation.ts` |
 
 - File names are camelCase with the layer name at the end: `<name><Layer>.ts`.
 - **Never use dots in file names** (`auth.controller.ts` is wrong, `authController.ts` is right).
@@ -42,7 +42,7 @@ router.get('/users', authController.getLoginUsers)
 router.post('/login', validateBody(loginSchema), authController.login)
 ```
 
-## 4. Controllers (`src/controllers/`)
+## 4. Controllers (`src/app/controllers/`)
 
 - Grouped by feature, so one controller may use several services.
 - Only hand the request over to the right service(s) and send back the result.
@@ -62,7 +62,7 @@ export async function getStats(_req: Request, res: Response) {
 }
 ```
 
-## 5. Services (`src/services/`)
+## 5. Services (`src/app/services/`)
 
 - All business logic lives here: checks, rules, decisions, and shaping the response.
 - Get and save data only by calling repositories.
@@ -83,7 +83,7 @@ export async function login({ userId, password }: LoginInput) {
 }
 ```
 
-## 6. Repositories (`src/repositories/`)
+## 6. Repositories (`src/app/repositories/`)
 
 - All database work (read, create, update, delete) happens only here.
 - No business logic and no `HttpError` here. Just talk to the database.
@@ -130,7 +130,7 @@ Check every input that comes from the client:
 | `req.params` | every route with URL params (`/:id`)          | `validateParams(schema)` |
 | `req.query`  | every route that reads query strings          | `validateQuery(schema)`  |
 
-- Schemas live in `src/validations/<feature>Validation.ts`.
+- Schemas live in `src/app/validations/<feature>Validation.ts`.
 - Export each schema and its type together:
 
 ```ts
@@ -148,13 +148,13 @@ export type LoginInput = z.infer<typeof loginSchema>
 ## 9. Errors
 
 - Services throw `HttpError` for known problems (400, 401, 403, 404, 409, ...).
-- Anything else is caught by `src/middlewares/errorHandler.ts` and returns 500.
+- Anything else is caught by `src/app/middlewares/errorHandler.ts` and returns 500.
 - Never send raw database errors back to the client.
 
 ## 10. Checklist for a new feature
 
-1. Zod schemas in `src/validations/<feature>Validation.ts` for body, params and query.
-2. Repository functions in `src/repositories/<table>Repository.ts` (with `db: DbClient = prisma`).
-3. Service functions in `src/services/<table>Service.ts` (logic, plus a transaction if it writes to more than one table).
-4. Controller function in `src/controllers/<feature>Controller.ts` (only calls the service or services).
+1. Zod schemas in `src/app/validations/<feature>Validation.ts` for body, params and query.
+2. Repository functions in `src/app/repositories/<table>Repository.ts` (with `db: DbClient = prisma`).
+3. Service functions in `src/app/services/<table>Service.ts` (logic, plus a transaction if it writes to more than one table).
+4. Controller function in `src/app/controllers/<feature>Controller.ts` (only calls the service or services).
 5. Route in `src/routes/<feature>Routes.ts` with the right `validate...` middleware, and register it in `app.ts` if it's a new router.

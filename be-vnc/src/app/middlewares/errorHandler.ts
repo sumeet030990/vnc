@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import { sendError } from '../lib/apiResponse'
-import { HttpError } from '../lib/httpError'
+import { sendError } from '../../lib/apiResponse'
+import { HttpError } from '../../lib/httpError'
 
 export function errorHandler(
   err: unknown,

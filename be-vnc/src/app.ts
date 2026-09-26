@@ -4,16 +4,16 @@ import cors from 'cors'
 import healthRouter from './routes/healthRoutes'
 import authRouter from './routes/authRoutes'
 import statsRouter from './routes/statsRoutes'
-import { errorHandler, notFoundHandler } from './middlewares/errorHandler'
+import { errorHandler, notFoundHandler } from './app/middlewares/errorHandler'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/health', healthRouter)
-app.use('/api/auth', authRouter)
-app.use('/api/stats', statsRouter)
+app.use('/health', healthRouter)
+app.use('/auth', authRouter)
+app.use('/stats', statsRouter)
 
 // Set by the desktop app so one server hosts both the API and the built UI.
 if (process.env.FRONTEND_DIR) {

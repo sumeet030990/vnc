@@ -1,4 +1,4 @@
-import prisma, { DbClient } from '../lib/prisma'
+import prisma, { DbClient } from '../../lib/prisma'
 
 export function findLoginUsers(db: DbClient = prisma) {
   return db.user.findMany({

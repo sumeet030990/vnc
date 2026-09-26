@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { sendSuccess } from '../lib/apiResponse'
+import { sendSuccess } from '../../lib/apiResponse'
 import * as itemService from '../services/itemService'
 import * as roleService from '../services/roleService'
 import * as userService from '../services/userService'

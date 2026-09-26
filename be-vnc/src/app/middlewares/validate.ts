@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
-import { sendError } from '../lib/apiResponse'
+import { sendError } from '../../lib/apiResponse'
 
 // Checks req.body against a Zod schema and replaces it with the parsed value.
 export function validateBody(schema: z.ZodType) {

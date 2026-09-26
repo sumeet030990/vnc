@@ -1,4 +1,4 @@
-import { HttpError } from '../lib/httpError'
+import { HttpError } from '../../lib/httpError'
 import * as userRepository from '../repositories/userRepository'
 import { LoginInput } from '../validations/authValidation'
 
