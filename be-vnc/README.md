@@ -63,3 +63,17 @@ Use the `mysql://` form of `DATABASE_URL`. The Prisma CLI reads it as-is, and [s
 | `npm run prisma:seed`    | Seed the database using `prisma/seed.ts` (re-runnable) |
 
 `npm install` runs `prisma generate` automatically via `postinstall`.
+
+## Reset the database
+
+This deletes all data. Only run it on your local dev database, and check that `DATABASE_URL` in `.env` points to it first.
+
+```bash
+# 1. Drop every table, then re-apply all migrations in prisma/migrations/
+npx prisma migrate reset
+
+# 2. Add the seed data back (Prisma 7 no longer seeds on reset)
+npm run prisma:seed
+```
+
+If `prisma migrate dev` says the database is out of sync with your migration files (for example after a migration file was deleted or replaced), this reset fixes it.
