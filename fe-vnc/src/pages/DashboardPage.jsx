@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import ChevronRight from '@mui/icons-material/ChevronRight'
-import { useAuth } from '../auth/authContext.js'
+import { useAuth } from '../auth/useAuth.js'
 import { useStatsSummary } from '../api/stats.js'
 import { NAV_ITEMS } from '../layouts/navItems.js'
 

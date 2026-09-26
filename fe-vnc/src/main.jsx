@@ -8,20 +8,21 @@ import './index.css'
 import App from './App.jsx'
 import theme from './theme.js'
 import { queryClient } from './lib/queryClient.js'
-import AuthProvider from './auth/AuthProvider.jsx'
+import { Provider } from 'react-redux'
+import { store } from './store/index.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <AuthProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <BrowserRouter>
             <App />
-          </AuthProvider>
-        </BrowserRouter>
-      </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </Provider>
   </StrictMode>,
 )

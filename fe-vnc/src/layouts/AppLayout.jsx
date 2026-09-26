@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import Logout from '@mui/icons-material/Logout'
-import { useAuth } from '../auth/authContext.js'
+import { useAuth } from '../auth/useAuth.js'
 
 const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'App'
 

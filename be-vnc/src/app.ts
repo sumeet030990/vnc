@@ -12,10 +12,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.use('/health', healthRouter)
-app.use('/auth', authRouter)
-app.use('/stats', statsRouter)
-app.use('/users', userRouter)
+app.use('/api/health', healthRouter)
+app.use('/api/auth', authRouter)
+app.use('/api/stats', statsRouter)
+app.use('/api/users', userRouter)
 
 // Set by the desktop app so one server hosts both the API and the built UI.
 if (process.env.FRONTEND_DIR) {

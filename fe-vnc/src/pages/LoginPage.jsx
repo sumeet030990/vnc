@@ -21,7 +21,7 @@ import { alpha } from '@mui/material/styles'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { useLogin, useLoginUsers } from '../api/auth.js'
-import { useAuth } from '../auth/authContext.js'
+import { useAuth } from '../auth/useAuth.js'
 import loginBg from '../assets/login-bg.png'
 
 // Bundled by Vite — replace src/assets/login-bg.avif to change it.
@@ -29,7 +29,7 @@ const BACKGROUND_IMAGE = loginBg
 const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'App'
 
 const validationSchema = yup.object({
-  userId: yup.number().required('Please select a user'),
+  user_name: yup.string().required('Please select a user'),
   password: yup.string().required('Please enter your password'),
 })
 
@@ -44,22 +44,21 @@ function LoginPage() {
   const redirectTo = location.state?.from?.pathname ?? '/dashboard'
 
   const handleSubmit = (values) => {
-    navigate(redirectTo, { replace: true })
-
-    // login
-    //   .mutateAsync(values)
-    //   .then((user) => {
-    //     auth.login(user)
-    //     navigate(redirectTo, { replace: true })
-    //   })
-    //   .catch(() => {
-    //     // Error is shown from login.error; keep the form usable.
-    //   })
+    login
+      .mutateAsync(values)
+      .then((loginResponse) => {
+        // Save { token, user } in Redux.
+        auth.login(loginResponse)
+        navigate(redirectTo, { replace: true })
+      })
+      .catch(() => {
+        // Error is shown from login.error; keep the form usable.
+      })
   }
 
   const formik = useFormik({
-    initialValues: { userId: '', password: '' },
-    // validationSchema,
+    initialValues: { user_name: 'deepak', password: '' },
+    validationSchema,
     onSubmit: handleSubmit,
   })
 
@@ -119,14 +118,14 @@ function LoginPage() {
 
               <TextField
                 select
-                id="userId"
-                name="userId"
+                id="user_name"
+                name="user_name"
                 label="User name"
-                value={formik.values.userId}
+                value={formik.values.user_name}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={Boolean(fieldError('userId'))}
-                helperText={fieldError('userId')}
+                error={Boolean(fieldError('user_name'))}
+                helperText={fieldError('user_name')}
                 disabled={users.isPending || users.isError}
                 slotProps={{
                   input: users.isPending
@@ -141,7 +140,7 @@ function LoginPage() {
                 }}
               >
                 {users.data?.map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
+                  <MenuItem key={user.id} value={user.user_name}>
                     {user.name}
                   </MenuItem>
                 ))}

@@ -18,7 +18,7 @@ const userSelect = {
 export function findLoginUsers(db: DbClient = prisma) {
   return db.user.findMany({
     where: { allow_login: true },
-    select: { id: true, name: true },
+    select: { id: true, name: true, user_name: true },
     orderBy: { name: 'asc' },
   })
 }
