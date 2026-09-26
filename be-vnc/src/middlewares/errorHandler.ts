@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { sendError } from '../lib/apiResponse'
 import { HttpError } from '../lib/httpError'
 
 export function errorHandler(
@@ -8,10 +9,15 @@ export function errorHandler(
   _next: NextFunction,
 ) {
   if (err instanceof HttpError) {
-    res.status(err.status).json({ message: err.message })
+    sendError(res, err.status, err.message)
     return
   }
 
   console.error(err)
-  res.status(500).json({ message: 'Something went wrong' })
+  sendError(res, 500, 'Something went wrong')
+}
+
+// Runs when no route matched the request.
+export function notFoundHandler(_req: Request, res: Response) {
+  sendError(res, 404, 'Route not found')
 }

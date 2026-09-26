@@ -4,6 +4,7 @@ import cors from 'cors'
 import healthRouter from './routes/healthRoutes'
 import authRouter from './routes/authRoutes'
 import statsRouter from './routes/statsRoutes'
+import { errorHandler, notFoundHandler } from './middlewares/errorHandler'
 
 const app = express()
 
@@ -25,5 +26,9 @@ if (process.env.FRONTEND_DIR) {
     res.sendFile(path.join(frontendDir, 'index.html'))
   })
 }
+
+// Must stay last: unknown routes get a 404, and thrown errors get the error shape.
+app.use(notFoundHandler)
+app.use(errorHandler)
 
 export default app

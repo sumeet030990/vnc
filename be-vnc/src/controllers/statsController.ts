@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { sendSuccess } from '../lib/apiResponse'
 import * as itemService from '../services/itemService'
 import * as roleService from '../services/roleService'
 import * as userService from '../services/userService'
@@ -10,5 +11,5 @@ export async function getStats(_req: Request, res: Response) {
     roleService.countRoles(),
     itemService.countItems(),
   ])
-  res.json({ users, roles, items })
+  sendSuccess(res, { users, roles, items })
 }

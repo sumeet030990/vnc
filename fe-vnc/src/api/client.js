@@ -29,5 +29,6 @@ export async function apiFetch(path, { body, headers, ...options } = {}) {
     )
   }
 
-  return data
+  // The API wraps every result as { success, message, data }.
+  return data?.data ?? null
 }
