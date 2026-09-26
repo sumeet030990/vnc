@@ -19,7 +19,10 @@ cp .env.example .env
 # 3. Create the database tables
 npm run prisma:migrate -- --name init
 
-# 4. Start the dev server
+# 4. Seed roles, items and demo users (safe to re-run)
+npm run prisma:seed
+
+# 5. Start the dev server
 npm run dev
 ```
 
@@ -51,11 +54,12 @@ Use the `mysql://` form of `DATABASE_URL`. The Prisma CLI reads it as-is, and [s
 
 ## Prisma commands
 
-| Command                  | Description                                           |
-| ------------------------ | ----------------------------------------------------- |
-| `npx prisma format`      | Format and validate `prisma/schema.prisma`            |
-| `npx prisma generate`    | Regenerate the Prisma client after editing the schema |
-| `npx prisma migrate dev` | create MigrationFiles and apply to db.                |
-| `npx prisma studio`      | Open Prisma Studio to browse and edit data            |
+| Command                  | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `npx prisma format`      | Format and validate `prisma/schema.prisma`             |
+| `npx prisma generate`    | Regenerate the Prisma client after editing the schema  |
+| `npx prisma migrate dev` | create MigrationFiles and apply to db.                 |
+| `npx prisma studio`      | Open Prisma Studio to browse and edit data             |
+| `npm run prisma:seed`    | Seed the database using `prisma/seed.ts` (re-runnable) |
 
 `npm install` runs `prisma generate` automatically via `postinstall`.
