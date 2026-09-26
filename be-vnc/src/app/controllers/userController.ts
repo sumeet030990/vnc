@@ -18,7 +18,10 @@ export async function getUser(req: Request, res: Response) {
 
 export async function createUser(req: Request, res: Response) {
   await roleService.ensureRoleExists(req.body.roleId)
-  sendSuccess(res, await userService.createUser(req.body), {
+
+  const result = await userService.createUser(req.body)
+
+  sendSuccess(res, result, {
     status: 201,
     message: 'User created',
   })
