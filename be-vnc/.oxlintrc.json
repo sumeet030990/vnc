@@ -11,6 +11,7 @@
   },
   "ignorePatterns": ["dist", "src/generated"],
   "rules": {
+    "oxc/no-async-endpoint-handlers": "off",
     "import/no-unassigned-import": [
       "warn",
       {

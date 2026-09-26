@@ -12,3 +12,9 @@ Follow these rules for every reply:
 - **For newer APIs:** If you want to use features added after the installed version, ask for permission and suggest the upgradation.
 - **No deprecated APIs:** Don't use anything marked deprecated in the installed version; use the recommended replacement instead.
 - **Ask before upgrading:** If a task truly needs a newer version, say so and wait for approval before changing any dependency.
+
+# Git
+
+- **Read-only access:** You may only run read commands (e.g. `git status`, `git log`, `git diff`, `git show`, `git branch --list`).
+- **No write actions:** Don't create branches, commit, push, merge, rebase, stash, tag, reset, or change any git state on your own.
+- **Always ask first:** Before any action other than reading, explain what you want to do and wait for my approval each time.

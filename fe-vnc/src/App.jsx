@@ -1,93 +1,26 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  CircularProgress,
-  Container,
-  Stack,
-  Typography,
-} from '@mui/material'
-import { useHealth } from './api/health.js'
-
-function ConnectionStatus({ isPending, isError }) {
-  if (isPending) {
-    return (
-      <Chip
-        icon={<CircularProgress size={14} />}
-        label="Checking…"
-        variant="outlined"
-      />
-    )
-  }
-  if (isError) {
-    return <Chip color="error" label="Disconnected" />
-  }
-  return <Chip color="success" label="Connected" />
-}
+import { useState } from 'react'
+import { Box, Button, Stack, Typography } from '@mui/material'
+import LoginPage from './pages/LoginPage.jsx'
 
 function App() {
-  const { data, error, isPending, isError, isFetching, refetch } = useHealth()
+  const [user, setUser] = useState(null)
 
+  if (!user) {
+    return <LoginPage onLogin={setUser} />
+  }
+
+  // Placeholder until the next page is built.
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
-      <Card variant="outlined">
-        <CardContent>
-          <Stack spacing={3}>
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Typography variant="h5" component="h1">
-                Backend status
-              </Typography>
-              <ConnectionStatus isPending={isPending} isError={isError} />
-            </Stack>
-
-            {isError && (
-              <Alert severity="error">
-                Could not reach the backend: {error.message}
-              </Alert>
-            )}
-
-            {data && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  GET /api/health response
-                </Typography>
-                <Box
-                  component="pre"
-                  sx={{
-                    m: 0,
-                    p: 2,
-                    borderRadius: 1,
-                    bgcolor: 'grey.100',
-                    fontFamily: 'monospace',
-                    fontSize: 14,
-                    overflowX: 'auto',
-                  }}
-                >
-                  {JSON.stringify(data, null, 2)}
-                </Box>
-              </Box>
-            )}
-
-            <Box>
-              <Button
-                variant="contained"
-                onClick={() => refetch()}
-                disabled={isFetching}
-              >
-                {isFetching ? 'Checking…' : 'Check again'}
-              </Button>
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
-    </Container>
+    <Box sx={{ p: 4 }}>
+      <Stack spacing={2} alignItems="flex-start">
+        <Typography variant="h5" component="h1">
+          Welcome, {user.name}
+        </Typography>
+        <Button variant="outlined" onClick={() => setUser(null)}>
+          Log out
+        </Button>
+      </Stack>
+    </Box>
   )
 }
 
