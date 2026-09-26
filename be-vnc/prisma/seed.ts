@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { hashPassword } from '../src/lib/password'
 import prisma from '../src/lib/prisma'
 
 const roles = [
@@ -92,7 +93,11 @@ async function main() {
     if (existing) continue
 
     await prisma.user.create({
-      data: { ...user, role: { connect: { slug: roleSlug } } },
+      data: {
+        ...user,
+        password: user.password && (await hashPassword(user.password)),
+        role: { connect: { slug: roleSlug } },
+      },
     })
   }
 

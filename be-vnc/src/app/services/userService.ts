@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma/client'
 import { HttpError } from '../../lib/httpError'
+import { hashPassword, verifyPassword } from '../../lib/password'
 import * as userRepository from '../repositories/userRepository'
 import { LoginInput } from '../validations/authValidation'
 import {
@@ -17,8 +18,11 @@ export function getLoginUsers() {
 export async function login({ userId, password }: LoginInput) {
   const user = await userRepository.findLoginUserById(userId)
 
-  // TODO: passwords are stored as plain text for now — hash them before going live.
-  if (!user || user.password !== password) {
+  if (
+    !user ||
+    !user.password ||
+    !(await verifyPassword(password, user.password))
+  ) {
     throw new HttpError(401, 'Invalid user or password')
   }
 
@@ -73,11 +77,13 @@ function ensurePasswordForLogin(allowLogin: boolean, password?: string | null) {
   }
 }
 
-export function createUser(input: CreateUserInput) {
+export async function createUser(input: CreateUserInput) {
   ensurePasswordForLogin(input.allow_login ?? false, input.password)
 
-  // TODO: passwords are stored as plain text for now — hash them before going live.
-  return userRepository.createUser(input)
+  return userRepository.createUser({
+    ...input,
+    password: input.password && (await hashPassword(input.password)),
+  })
 }
 
 // Used by both PUT and PATCH — the schemas decide which fields are required.
@@ -95,7 +101,11 @@ export async function updateUser(
     input.password ?? existing.password,
   )
 
-  return userRepository.updateUser(id, input)
+  // Only hash when a new password is sent; otherwise keep the stored one.
+  return userRepository.updateUser(id, {
+    ...input,
+    ...(input.password && { password: await hashPassword(input.password) }),
+  })
 }
 
 export async function deleteUser(id: number) {
