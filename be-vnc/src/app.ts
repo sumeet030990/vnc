@@ -1,9 +1,9 @@
 import path from 'path'
 import express from 'express'
 import cors from 'cors'
-import healthRouter from './routes/health'
-import authRouter from './routes/auth'
-import statsRouter from './routes/stats'
+import healthRouter from './routes/healthRoutes'
+import authRouter from './routes/authRoutes'
+import statsRouter from './routes/statsRoutes'
 
 const app = express()
 

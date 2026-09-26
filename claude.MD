@@ -13,6 +13,10 @@ Follow these rules for every reply:
 - **No deprecated APIs:** Don't use anything marked deprecated in the installed version; use the recommended replacement instead.
 - **Ask before upgrading:** If a task truly needs a newer version, say so and wait for approval before changing any dependency.
 
+# Backend Rules
+
+- **Always follow the backend code rules** in @be-vnc/project.md when writing backend code.
+
 # Git
 
 - **Read-only access:** You may only run read commands (e.g. `git status`, `git log`, `git diff`, `git show`, `git branch --list`).

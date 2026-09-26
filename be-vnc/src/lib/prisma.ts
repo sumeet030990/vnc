@@ -1,5 +1,5 @@
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
-import { PrismaClient } from '../generated/prisma/client'
+import { Prisma, PrismaClient } from '../generated/prisma/client'
 
 const databaseUrl = process.env.DATABASE_URL
 
@@ -23,3 +23,7 @@ const adapter = new PrismaMariaDb({
 const prisma = new PrismaClient({ adapter })
 
 export default prisma
+
+// Repositories accept either the shared client or a transaction client, so
+// services can run several repository calls inside one `prisma.$transaction`.
+export type DbClient = PrismaClient | Prisma.TransactionClient
