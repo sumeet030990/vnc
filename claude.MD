@@ -17,6 +17,10 @@ Follow these rules for every reply:
 
 - **Always follow the backend code rules** in @be-vnc/project.md when writing backend code.
 
+# Frontend Rules
+
+- **Always follow the frontend UI/theme rules** in @fe-vnc/project.md when writing frontend code.
+
 # Git
 
 - **Read-only access:** You may only run read commands (e.g. `git status`, `git log`, `git diff`, `git show`, `git branch --list`).
