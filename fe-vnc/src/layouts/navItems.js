@@ -1,6 +1,5 @@
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined'
 import PeopleOutlined from '@mui/icons-material/PeopleOutlined'
-import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import AssessmentOutlined from '@mui/icons-material/AssessmentOutlined'
@@ -38,12 +37,6 @@ export const MASTER_DATA_ITEMS = [
     label: 'Users',
     icon: PeopleOutlined,
     description: 'Manage people and their login access',
-  },
-  {
-    to: '/roles',
-    label: 'Roles',
-    icon: AdminPanelSettingsOutlined,
-    description: 'See the roles users can be given',
   },
   {
     to: '/items',

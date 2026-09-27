@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import UsersPage from './pages/users/UsersPage.jsx'
+import ItemsPage from './pages/items/ItemsPage.jsx'
 
 function App() {
   return (
@@ -25,8 +26,7 @@ function App() {
             element={<ComingSoonPage title="Sauda Book" />}
           />
           <Route path="/users" element={<UsersPage />} />
-          <Route path="/roles" element={<ComingSoonPage title="Roles" />} />
-          <Route path="/items" element={<ComingSoonPage title="Items" />} />
+          <Route path="/items" element={<ItemsPage />} />
         </Route>
       </Route>
 

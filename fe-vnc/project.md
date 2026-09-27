@@ -12,7 +12,7 @@
 - **Colors** (Neutral + Gold Accent — premium SaaS/dashboard feel; defined in `src/theme.js`):
   - **Primary**: Charcoal Navy `#1E2A32` (alt: Slate `#2C3639`) — app bar, buttons, shadows, dividers; white text on top.
   - **Secondary/Accent**: Gold `#C9A227` (brand) — highlights/CTAs; use dark navy text on gold, not white.
-  - **Background**: Soft Cream `#FAF7F0` (alt: Off-white `#F8F8F5`).
+  - **Background**: Soft Cream `#efeeea` (alt: Off-white `#F8F8F5`).
   - **Surface**: White `#FFFFFF` for cards and panels.
   - **Text**: `#2B2B2B` primary; secondary text is the same color at 70% opacity.
   - No green in UI chrome — gold + neutrals carry the branding.

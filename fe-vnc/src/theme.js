@@ -31,7 +31,7 @@ const baseTheme = createTheme({
       contrastText: NAVY,
     },
     background: {
-      default: '#FAF7F0',
+      default: '#efeeea',
       paper: '#FFFFFF',
     },
     text: {

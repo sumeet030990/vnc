@@ -6,6 +6,7 @@ import authRouter from './routes/authRoutes'
 import statsRouter from './routes/statsRoutes'
 import userRouter from './routes/userRoutes'
 import roleRouter from './routes/roleRoutes'
+import itemRouter from './routes/itemRoutes'
 import { errorHandler, notFoundHandler } from './app/middlewares/errorHandler'
 
 const app = express()
@@ -18,6 +19,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/stats', statsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/roles', roleRouter)
+app.use('/api/items', itemRouter)
 
 // Set by the desktop app so one server hosts both the API and the built UI.
 if (process.env.FRONTEND_DIR) {
