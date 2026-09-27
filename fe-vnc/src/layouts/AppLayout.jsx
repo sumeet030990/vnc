@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import {
   AppBar,
   Avatar,
@@ -9,6 +9,7 @@ import {
   Divider,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   Menu,
   MenuItem,
   Toolbar,
@@ -17,7 +18,7 @@ import {
 import { alpha } from '@mui/material/styles'
 import Logout from '@mui/icons-material/Logout'
 import { useAuth } from '../auth/useAuth.js'
-import { NAV_ITEMS } from './navItems.js'
+import { MASTER_DATA_ITEMS, NAV_ITEMS } from './navItems.js'
 
 const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'App'
 
@@ -32,6 +33,7 @@ const initials = (name = '') =>
 function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [userAnchor, setUserAnchor] = useState(null)
 
   const handleLogout = () => {
@@ -146,6 +148,27 @@ function AppLayout() {
                   {user?.role?.name}
                 </Typography>
               </Box>
+              <Divider />
+              <ListSubheader
+                disableSticky
+                sx={{ lineHeight: '32px', bgcolor: 'transparent' }}
+              >
+                Master data
+              </ListSubheader>
+              {MASTER_DATA_ITEMS.map(({ to, label, icon: Icon }) => (
+                <MenuItem
+                  key={to}
+                  component={NavLink}
+                  to={to}
+                  selected={pathname.startsWith(to)}
+                  onClick={() => setUserAnchor(null)}
+                >
+                  <ListItemIcon>
+                    <Icon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{label}</ListItemText>
+                </MenuItem>
+              ))}
               <Divider />
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>

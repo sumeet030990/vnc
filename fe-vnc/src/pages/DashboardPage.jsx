@@ -1,11 +1,9 @@
-import { Link as RouterLink } from 'react-router'
 import {
   Alert,
   Avatar,
   Box,
   Button,
   Card,
-  CardActionArea,
   CardContent,
   Chip,
   Grid,
@@ -14,15 +12,29 @@ import {
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import ChevronRight from '@mui/icons-material/ChevronRight'
+import TodayOutlined from '@mui/icons-material/TodayOutlined'
+import CalendarViewWeekOutlined from '@mui/icons-material/CalendarViewWeekOutlined'
+import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
+import TrendingUpOutlined from '@mui/icons-material/TrendingUpOutlined'
 import { useAuth } from '../auth/useAuth.js'
 import { useStatsSummary } from '../api/stats.js'
-import { NAV_ITEMS } from '../layouts/navItems.js'
 
-const SECTIONS = NAV_ITEMS.filter((item) => item.to !== '/dashboard')
+// Each card reads its profit value from /api/stats by `key`.
+const PROFIT_STATS = [
+  { key: 'todayProfit', label: 'Today', icon: TodayOutlined },
+  { key: 'weeklyProfit', label: 'This week', icon: CalendarViewWeekOutlined },
+  { key: 'monthlyProfit', label: 'This month', icon: CalendarMonthOutlined },
+  { key: 'yearlyProfit', label: 'This year', icon: TrendingUpOutlined },
+]
 
-// Maps each count from /api/stats to its section.
-const STAT_KEYS = { '/users': 'users', '/roles': 'roles', '/items': 'items' }
+const currency = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 0,
+})
+
+const formatProfit = (value) =>
+  typeof value === 'number' ? currency.format(value) : '—'
 
 const greeting = () => {
   const hour = new Date().getHours()
@@ -77,7 +89,7 @@ function StatCard({ label, icon: Icon, value, isPending }) {
           sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}
         >
           <Typography variant="body2" color="text.secondary">
-            Total {label.toLowerCase()}
+            {label} profit
           </Typography>
           <Avatar
             variant="rounded"
@@ -91,34 +103,9 @@ function StatCard({ label, icon: Icon, value, isPending }) {
           component="p"
           sx={{ fontWeight: 600, mt: 1, letterSpacing: '-0.02em' }}
         >
-          {isPending ? <Skeleton width={64} /> : (value ?? '—')}
+          {isPending ? <Skeleton width={120} /> : formatProfit(value)}
         </Typography>
       </CardContent>
-    </Card>
-  )
-}
-
-function QuickLinkCard({ to, label, icon: Icon, description }) {
-  return (
-    <Card sx={{ height: '100%' }}>
-      <CardActionArea component={RouterLink} to={to} sx={{ height: '100%' }}>
-        <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <Avatar variant="rounded" sx={iconTileSx}>
-              <Icon />
-            </Avatar>
-            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-              <Typography variant="h6" component="h3">
-                {label}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {description}
-              </Typography>
-            </Box>
-            <ChevronRight sx={{ color: 'text.secondary' }} />
-          </Stack>
-        </CardContent>
-      </CardActionArea>
     </Card>
   )
 }
@@ -131,7 +118,7 @@ function DashboardPage() {
     <Stack spacing={5}>
       <WelcomeHeader user={user} />
 
-      <Box component="section" aria-label="Totals">
+      <Box component="section" aria-label="Profit">
         {stats.isError && (
           <Alert
             severity="error"
@@ -146,31 +133,18 @@ function DashboardPage() {
               </Button>
             }
           >
-            We couldn't load your totals right now.
+            We couldn't load your profit right now.
           </Alert>
         )}
         <Grid container spacing={3}>
-          {SECTIONS.map((section) => (
-            <Grid key={section.to} size={{ xs: 12, sm: 4 }}>
+          {PROFIT_STATS.map((stat) => (
+            <Grid key={stat.key} size={{ xs: 12, sm: 6, md: 3 }}>
               <StatCard
-                label={section.label}
-                icon={section.icon}
-                value={stats.data?.[STAT_KEYS[section.to]]}
+                label={stat.label}
+                icon={stat.icon}
+                value={stats.data?.[stat.key]}
                 isPending={stats.isPending}
               />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-
-      <Box component="section">
-        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          Quick links
-        </Typography>
-        <Grid container spacing={3}>
-          {SECTIONS.map((section) => (
-            <Grid key={section.to} size={{ xs: 12, md: 4 }}>
-              <QuickLinkCard {...section} />
             </Grid>
           ))}
         </Grid>

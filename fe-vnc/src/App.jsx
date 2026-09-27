@@ -15,6 +15,15 @@ function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route
+            path="/commission-bills"
+            element={<ComingSoonPage title="Commission Bill" />}
+          />
+          <Route path="/reports" element={<ComingSoonPage title="Reports" />} />
+          <Route
+            path="/sauda-book"
+            element={<ComingSoonPage title="Sauda Book" />}
+          />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<ComingSoonPage title="Roles" />} />
           <Route path="/items" element={<ComingSoonPage title="Items" />} />
