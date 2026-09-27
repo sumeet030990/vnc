@@ -41,6 +41,14 @@ export function countUsers() {
   return userRepository.countUsers()
 }
 
+// A role can only be deleted once no user is linked to it.
+export async function ensureNoUsersInRole(roleId: number) {
+  const count = await userRepository.countUsers({ roleId })
+  if (count > 0) {
+    throw new HttpError(409, 'Role is assigned to users and cannot be deleted')
+  }
+}
+
 export async function listUsers({
   page,
   pageSize,
