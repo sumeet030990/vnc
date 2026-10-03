@@ -3,7 +3,6 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router'
 import {
   Box,
   Button,
-  Chip,
   Fade,
   MenuItem,
   Snackbar,
@@ -11,10 +10,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { alpha } from '@mui/material/styles'
 import Add from '@mui/icons-material/Add'
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
+import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import { useBills } from '../../api/bills.js'
 import { useUserOptions } from '../../api/users.js'
@@ -112,16 +111,21 @@ function BillsPage() {
       {
         accessorKey: 'id',
         header: 'Bill',
-        size: 150,
-        Cell: ({ row }) => (
-          <Box>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              #{row.original.id}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {dateFormat.format(new Date(row.original.bill_date))}
-            </Typography>
-          </Box>
+        size: 110,
+        Cell: ({ cell }) => (
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            #{cell.getValue()}
+          </Typography>
+        ),
+      },
+      {
+        accessorKey: 'bill_date',
+        header: 'Date',
+        size: 140,
+        Cell: ({ cell }) => (
+          <Typography variant="body2" noWrap>
+            {dateFormat.format(new Date(cell.getValue()))}
+          </Typography>
         ),
       },
       {
@@ -147,22 +151,6 @@ function BillsPage() {
               {row.original.lorry_number || 'No lorry number'}
             </Typography>
           </Box>
-        ),
-      },
-      {
-        accessorKey: '_count.bill_items',
-        header: 'Items',
-        size: 90,
-        Cell: ({ cell }) => (
-          <Chip
-            label={cell.getValue()}
-            size="small"
-            sx={{
-              minWidth: 32,
-              bgcolor: (t) => alpha(t.palette.primary.main, 0.06),
-              color: 'primary.main',
-            }}
-          />
         ),
       },
       {
@@ -225,6 +213,7 @@ function BillsPage() {
           pagination={pagination}
           onPaginationChange={setPagination}
           rowCount={total}
+          actionsSize={136}
           filters={
             <>
               <PersonFilter
@@ -243,6 +232,19 @@ function BillsPage() {
           }
           renderRowActions={({ row }) => (
             <>
+              <RowActionButton
+                title="Print"
+                label={`Print bill ${row.original.id}`}
+                icon={<PrintOutlined fontSize="small" />}
+                // New tab, so the list keeps its page and filters.
+                onClick={() =>
+                  window.open(
+                    `/commission-bills/${row.original.id}/print`,
+                    '_blank',
+                    'noopener',
+                  )
+                }
+              />
               <RowActionButton
                 title="Edit"
                 label={`Edit bill ${row.original.id}`}

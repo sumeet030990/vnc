@@ -6,8 +6,10 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import UsersPage from './pages/users/UsersPage.jsx'
 import ItemsPage from './pages/items/ItemsPage.jsx'
+import CompaniesPage from './pages/companies/CompaniesPage.jsx'
 import BillsPage from './pages/bills/BillsPage.jsx'
 import BillFormPage from './pages/bills/BillFormPage.jsx'
+import BillPrintPage from './pages/bills/BillPrintPage.jsx'
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
 
       {/* Everything inside here needs a logged-in user. */}
       <Route element={<RequireAuth />}>
+        {/* Printable bill: no app bar, so it sits outside the layout. */}
+        <Route path="/commission-bills/:id/print" element={<BillPrintPage />} />
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/commission-bills" element={<BillsPage />} />
@@ -28,6 +32,7 @@ function App() {
           />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/items" element={<ItemsPage />} />
+          <Route path="/companies" element={<CompaniesPage />} />
         </Route>
       </Route>
 

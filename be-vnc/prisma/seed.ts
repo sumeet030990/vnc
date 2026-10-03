@@ -11,6 +11,21 @@ const roles = [
 
 const items = [{ name: 'Toor Dal', slug: 'toor_dal' }]
 
+// Dummy data only — fill real company details through the app, not the seed.
+const companies = [
+  {
+    name: 'Venkateshwara Canvassers',
+    primary_mobile_no: '9000000100',
+    primary_email: 'demo@example.com',
+    address: '1 Sample Street',
+    pin_code: '440001',
+    city: 'Nagpur',
+    state: 'Maharashtra',
+    seller_commision_percentage: 1,
+    buyer_commision_percentage: 1,
+  },
+]
+
 // Dummy data only — never seed real people here.
 const users = [
   {
@@ -97,6 +112,14 @@ async function main() {
     })
   }
 
+  for (const { name, ...company } of companies) {
+    await prisma.company.upsert({
+      where: { name },
+      update: company,
+      create: { name, ...company },
+    })
+  }
+
   // primary_mobile_no isn't unique in the schema, so upsert isn't available — skip existing rows instead.
   for (const { roleSlug, ...user } of users) {
     const existing = await prisma.users.findFirst({
@@ -114,7 +137,7 @@ async function main() {
   }
 
   console.log(
-    `Seeded ${roles.length} roles, ${items.length} items, ${users.length} users`,
+    `Seeded ${roles.length} roles, ${items.length} items, ${companies.length} companies, ${users.length} users`,
   )
 }
 

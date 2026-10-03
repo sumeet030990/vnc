@@ -1,4 +1,10 @@
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+import { useMemo } from 'react'
+import {
+  MaterialReactTable,
+  getAllLeafColumnDefs,
+  getColumnId,
+  useMaterialReactTable,
+} from 'material-react-table'
 import {
   Alert,
   Box,
@@ -15,6 +21,7 @@ const PAGE_SIZES = [10, 20, 50]
 // - `query` is the React Query result for the list (isPending, isFetching, error, refetch).
 // - Pass `rowCount` when the API does the paging; leave it out to page in the browser.
 // - `filters` goes in the top toolbar; `renderRowActions` returns the row's buttons.
+// - `actionsSize` is the width of the actions column; widen it for more buttons.
 // - Any other option is passed straight to `useMaterialReactTable`.
 function DataTable({
   columns,
@@ -28,11 +35,23 @@ function DataTable({
   filters,
   renderRowActions,
   emptyState,
+  actionsSize = 96,
   pageSizes = PAGE_SIZES,
   ...tableOptions
 }) {
   const isServerPaged = rowCount !== undefined
   const total = isServerPaged ? rowCount : data.length
+  const hasRowActions = Boolean(renderRowActions)
+
+  // Set the column order ourselves so the actions column always stays last,
+  // even after columns are added or removed.
+  const columnOrder = useMemo(
+    () => [
+      ...getAllLeafColumnDefs(columns).map(getColumnId),
+      ...(hasRowActions ? ['mrt-row-actions'] : []),
+    ],
+    [columns, hasRowActions],
+  )
 
   const table = useMaterialReactTable({
     columns,
@@ -44,6 +63,7 @@ function DataTable({
     rowCount,
     onPaginationChange,
     state: {
+      columnOrder,
       pagination,
       isLoading: query.isPending,
     },
@@ -116,10 +136,10 @@ function DataTable({
         />
       ),
 
-    enableRowActions: Boolean(renderRowActions),
+    enableRowActions: hasRowActions,
     positionActionsColumn: 'last',
     displayColumnDefOptions: {
-      'mrt-row-actions': { header: '', size: 96 },
+      'mrt-row-actions': { header: '', size: actionsSize },
     },
     renderRowActions: renderRowActions
       ? (props) => (

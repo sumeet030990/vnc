@@ -32,6 +32,7 @@ model Roles {
 model Company {
   id                          Int      @id @default(autoincrement())
   name                        String   @unique
+  logo                        String?
   primary_mobile_no           String?
   secondary_mobile_no         String?
   primary_email               String?
