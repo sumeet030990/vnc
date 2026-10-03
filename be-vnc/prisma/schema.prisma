@@ -16,6 +16,7 @@ model Item {
   name       String       @unique
   slug       String       @unique
   bill_items Bill_items[]
+
   @@map("item")
 }
 
@@ -24,6 +25,7 @@ model Role {
   name  String @unique
   slug  String @unique
   users User[]
+
   @@map("role")
 }
 
@@ -43,6 +45,7 @@ model Company {
   buyer_commision_percentage  Float?
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime @updatedAt
+
   @@map("company")
 }
 
@@ -67,6 +70,7 @@ model User {
   buyer_bills         Bill[]       @relation("BuyerBills")
   saler_bills         Bill_items[] @relation("SellerBills")
   transporter_bills   Bill[]       @relation("TransporterBills")
+
   @@map("user")
 }
 
@@ -87,6 +91,7 @@ model Bill {
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
   bill_items             Bill_items[] @relation("BillItems")
+
   @@map("bill")
 }
 
@@ -102,10 +107,11 @@ model Bill_items {
   quantity_bags           Int
   packaging               Int
   weight                  Int
-  rate                    Float
+  souda_rate              Float
   amount                  Float
   seller_commision_amount Float?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
+
   @@map("bill_items")
 }

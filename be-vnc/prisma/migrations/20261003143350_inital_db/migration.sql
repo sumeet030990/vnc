@@ -93,7 +93,7 @@ CREATE TABLE `bill_items` (
     `quantity_bags` INTEGER NOT NULL,
     `packaging` INTEGER NOT NULL,
     `weight` INTEGER NOT NULL,
-    `rate` DOUBLE NOT NULL,
+    `souda_rate` DOUBLE NOT NULL,
     `amount` DOUBLE NOT NULL,
     `seller_commision_amount` DOUBLE NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
