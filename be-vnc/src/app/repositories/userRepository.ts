@@ -5,7 +5,7 @@ import prisma, { DbClient } from '../../lib/prisma'
 const userSelect = {
   id: true,
   name: true,
-  mobile_no: true,
+  primary_mobile_no: true,
   address: true,
   city: true,
   allow_login: true,

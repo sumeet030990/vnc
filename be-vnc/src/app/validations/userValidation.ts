@@ -67,7 +67,7 @@ export const listUsersQuerySchema = z.object({
 export const createUserSchema = z.object({
   roleId,
   name: optionalText('Name').optional(),
-  mobile_no: mobileNo,
+  primary_mobile_no: mobileNo,
   address: optionalText('Address').optional(),
   city: optionalText('City').optional(),
   allow_login: allowLogin.optional(),
@@ -80,7 +80,7 @@ export const createUserSchema = z.object({
 export const replaceUserSchema = z.object({
   roleId,
   name: optionalText('Name'),
-  mobile_no: mobileNo,
+  primary_mobile_no: mobileNo,
   address: optionalText('Address'),
   city: optionalText('City'),
   allow_login: allowLogin,

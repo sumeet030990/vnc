@@ -8,8 +8,11 @@ const itemSelect = {
   slug: true,
 } satisfies Prisma.ItemSelect
 
-export function countItems(db: DbClient = prisma) {
-  return db.item.count()
+export function countItems(
+  where: Prisma.ItemWhereInput = {},
+  db: DbClient = prisma,
+) {
+  return db.item.count({ where })
 }
 
 export function findItemById(id: number, db: DbClient = prisma) {

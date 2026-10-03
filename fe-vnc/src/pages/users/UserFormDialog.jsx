@@ -42,7 +42,7 @@ const optionalText = (label) =>
 const buildSchema = (isEdit) =>
   yup.object({
     name: optionalText('Name').required('Please enter a name'),
-    mobile_no: yup
+    primary_mobile_no: yup
       .string()
       .trim()
       .required('Please enter a mobile number')
@@ -74,7 +74,7 @@ const buildSchema = (isEdit) =>
 
 const toFormValues = (user) => ({
   name: user?.name ?? '',
-  mobile_no: user?.mobile_no ?? '',
+  primary_mobile_no: user?.primary_mobile_no ?? '',
   roleId: user?.role?.id ?? '',
   city: user?.city ?? '',
   address: user?.address ?? '',
@@ -88,7 +88,7 @@ const orNull = (value) => value.trim() || null
 
 const toRequestBody = (values) => ({
   name: orNull(values.name),
-  mobile_no: values.mobile_no.trim(),
+  primary_mobile_no: values.primary_mobile_no.trim(),
   roleId: Number(values.roleId),
   city: orNull(values.city),
   address: orNull(values.address),
@@ -234,7 +234,7 @@ function UserFormDialog({ open, user, onClose, onSaved }) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              {...fieldProps('mobile_no')}
+              {...fieldProps('primary_mobile_no')}
               label="Mobile number"
               required
               type="tel"

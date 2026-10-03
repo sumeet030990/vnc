@@ -188,7 +188,7 @@ function UsersPage() {
         ),
       },
       {
-        accessorKey: 'mobile_no',
+        accessorKey: 'primary_mobile_no',
         header: 'Mobile',
         size: 150,
         Cell: ({ cell }) => (

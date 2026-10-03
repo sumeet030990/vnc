@@ -10,6 +10,17 @@ export function countItems() {
   return itemRepository.countItems()
 }
 
+// Throws when any of the given item ids is missing. Repeated ids are fine.
+export async function ensureItemsExist(itemIds: number[]) {
+  const ids = [...new Set(itemIds)]
+  if (ids.length === 0) return
+
+  const count = await itemRepository.countItems({ id: { in: ids } })
+  if (count !== ids.length) {
+    throw new HttpError(400, 'Item does not exist')
+  }
+}
+
 export function listItems() {
   return itemRepository.findItems()
 }

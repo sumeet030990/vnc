@@ -41,6 +41,23 @@ export function countUsers() {
   return userRepository.countUsers()
 }
 
+// Throws `message` when any of the given user ids is missing. Undefined ids
+// (fields not sent on update) and repeated ids are skipped.
+export async function ensureUsersExist(
+  userIds: (number | undefined)[],
+  message: string,
+) {
+  const ids = [
+    ...new Set(userIds.filter((id): id is number => id !== undefined)),
+  ]
+  if (ids.length === 0) return
+
+  const count = await userRepository.countUsers({ id: { in: ids } })
+  if (count !== ids.length) {
+    throw new HttpError(400, message)
+  }
+}
+
 // A role can only be deleted once no user is linked to it.
 export async function ensureNoUsersInRole(roleId: number) {
   const count = await userRepository.countUsers({ roleId })
@@ -61,7 +78,7 @@ export async function listUsers({
       OR: [
         { name: { contains: search } },
         { user_name: { contains: search } },
-        { mobile_no: { contains: search } },
+        { primary_mobile_no: { contains: search } },
         { city: { contains: search } },
       ],
     }),

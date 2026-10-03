@@ -98,7 +98,7 @@ model Bill {
 model Bill_items {
   id                      Int      @id @default(autoincrement())
   bill_id                 Int
-  bill                    Bill     @relation("BillItems", fields: [bill_id], references: [id])
+  bill                    Bill     @relation("BillItems", fields: [bill_id], references: [id], onDelete: Cascade)
   sellerId                Int
   seller                  User     @relation("SellerBills", fields: [sellerId], references: [id])
   itemId                  Int
