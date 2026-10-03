@@ -181,7 +181,11 @@ function AppLayout() {
         </Toolbar>
       </AppBar>
 
-      <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
+      <Container
+        component="main"
+        maxWidth={false}
+        sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 5 } }}
+      >
         <Outlet />
       </Container>
     </Box>

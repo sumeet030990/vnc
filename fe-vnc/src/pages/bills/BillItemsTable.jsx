@@ -58,7 +58,7 @@ const numberInputSx = {
   '& input': { textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
 }
 
-function HeaderCell({ children, align = 'left' }) {
+function HeaderCell({ children, align = 'center' }) {
   return (
     <Typography
       variant="caption"
@@ -181,9 +181,7 @@ function BillItemsTable({ formik }) {
             <HeaderCell>Item</HeaderCell>
             <HeaderCell>Seller bill no.</HeaderCell>
             {NUMBER_COLUMNS.map((column) => (
-              <HeaderCell key={column.field} align="right">
-                {column.label}
-              </HeaderCell>
+              <HeaderCell key={column.field}>{column.label}</HeaderCell>
             ))}
             <span />
           </Box>

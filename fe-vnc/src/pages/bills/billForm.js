@@ -81,10 +81,10 @@ export const toFormValues = (bill) => ({
   transporter: bill?.transporter ?? null,
   lorry_number: asText(bill?.lorry_number),
   lorry_driver_contact: asText(bill?.lorry_driver_contact),
-  freight: asText(bill?.freight ?? 0),
-  advance_freight: asText(bill?.advance_freight ?? 0),
-  lorry_brokerage: asText(bill?.lorry_brokerage ?? 0),
-  buyer_commision_amount: asText(bill?.buyer_commision_amount ?? 0),
+  freight: asText(bill?.freight),
+  advance_freight: asText(bill?.advance_freight),
+  lorry_brokerage: asText(bill?.lorry_brokerage),
+  buyer_commision_amount: asText(bill?.buyer_commision_amount),
   bill_items: bill?.bill_items?.length
     ? bill.bill_items.map((row) => ({
         key: rowKey(),
