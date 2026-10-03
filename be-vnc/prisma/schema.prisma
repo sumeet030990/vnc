@@ -81,13 +81,13 @@ model Bills {
   transporter_id         Int
   transporter            Users        @relation("TransporterBills", fields: [transporter_id], references: [id])
   bill_date              DateTime     @default(dbgenerated("(curdate())")) @db.Date
-  total_amount           Float?
-  buyer_commision_amount Float?
+  total_amount           Float
+  buyer_commision_amount Float  @default(0)
   lorry_number           String?
   lorry_driver_contact   String?
-  freight                Float?
-  advance_freight        Float?
-  lorry_brokerage        Float?
+  freight                Float  @default(0)
+  advance_freight        Float  @default(0)
+  lorry_brokerage        Float  @default(0)
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
   bill_items             Bill_items[] @relation("BillItems")
@@ -109,7 +109,7 @@ model Bill_items {
   weight                  Float
   souda_rate              Float
   amount                  Float
-  seller_commision_amount Float?
+  seller_commision_amount Float  @default(0)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
