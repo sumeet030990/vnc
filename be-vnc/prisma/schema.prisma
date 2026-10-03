@@ -12,9 +12,11 @@ datasource db {
 }
 
 model Item {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  slug String @unique
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  slug       String       @unique
+  bill_items Bill_items[]
+  @@map("item")
 }
 
 model Role {
@@ -22,20 +24,88 @@ model Role {
   name  String @unique
   slug  String @unique
   users User[]
+  @@map("role")
+}
+
+model Company {
+  id                          Int      @id @default(autoincrement())
+  name                        String   @unique
+  primary_mobile_no           String?
+  secondary_mobile_no         String?
+  primary_email               String?
+  secondary_email             String?
+  address                     String?
+  pin_code                    String?
+  city                        String?
+  state                       String?
+  gst_number                  String?
+  seller_commision_percentage Float?
+  buyer_commision_percentage  Float?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+  @@map("company")
 }
 
 // Example model — replace with your own
 model User {
-  id          Int      @id @default(autoincrement())
-  roleId      Int
-  role        Role     @relation(fields: [roleId], references: [id])
-  name        String?
-  mobile_no   String?
-  address     String?
-  city        String?
-  allow_login Boolean  @default(false)
-  user_name   String?  @unique
-  password    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  Int          @id @default(autoincrement())
+  roleId              Int
+  role                Role         @relation(fields: [roleId], references: [id])
+  name                String?
+  primary_mobile_no   String?
+  secondary_mobile_no String?
+  address             String?
+  pin_code            String?
+  city                String?
+  state               String?
+  allow_login         Boolean      @default(false)
+  user_name           String?      @unique
+  password            String?
+  gst_number          String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  buyer_bills         Bill[]       @relation("BuyerBills")
+  saler_bills         Bill_items[] @relation("SellerBills")
+  transporter_bills   Bill[]       @relation("TransporterBills")
+  @@map("user")
+}
+
+model Bill {
+  id                     Int          @id @default(autoincrement())
+  buyerId                Int
+  buyer                  User         @relation("BuyerBills", fields: [buyerId], references: [id])
+  transporter_id         Int
+  transporter            User         @relation("TransporterBills", fields: [transporter_id], references: [id])
+  total_amount           Float?
+  buyer_commision_amount Float?
+  lorry_number           String?
+  lorry_driver_name      String?
+  lorry_driver_contact   String?
+  freight                Float?
+  advance_freight        Float?
+  lorry_brokerage        Float?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  bill_items             Bill_items[] @relation("BillItems")
+  @@map("bill")
+}
+
+model Bill_items {
+  id                      Int      @id @default(autoincrement())
+  bill_id                 Int
+  bill                    Bill     @relation("BillItems", fields: [bill_id], references: [id])
+  sellerId                Int
+  seller                  User     @relation("SellerBills", fields: [sellerId], references: [id])
+  itemId                  Int
+  seller_bill_no          String?
+  item                    Item     @relation(fields: [itemId], references: [id])
+  quantity_bags           Int
+  packaging               Int
+  weight                  Int
+  rate                    Float
+  amount                  Float
+  seller_commision_amount Float?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  @@map("bill_items")
 }

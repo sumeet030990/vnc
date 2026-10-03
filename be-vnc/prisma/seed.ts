@@ -16,7 +16,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Sumeet',
-    mobile_no: '9000000000',
+    primary_mobile_no: '9000000000',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -26,7 +26,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Deepak',
-    mobile_no: '9000000001',
+    primary_mobile_no: '9000000001',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -36,7 +36,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Swapnil',
-    mobile_no: '9000000004',
+    primary_mobile_no: '9000000004',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -46,7 +46,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Ayush',
-    mobile_no: '9000000005',
+    primary_mobile_no: '9000000005',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -56,7 +56,7 @@ const users = [
   {
     roleSlug: 'buyer',
     name: 'Demo Manager',
-    mobile_no: '9000000002',
+    primary_mobile_no: '9000000002',
     address: '2 Sample Street',
     city: 'Nagpur',
     allow_login: false,
@@ -64,7 +64,7 @@ const users = [
   {
     roleSlug: 'seller',
     name: 'Dayalu Dall Mill',
-    mobile_no: '9000000003',
+    primary_mobile_no: '9000000003',
     address: '',
     city: 'Nagpur',
     allow_login: false,
@@ -89,10 +89,10 @@ async function main() {
     })
   }
 
-  // mobile_no isn't unique in the schema, so upsert isn't available — skip existing rows instead.
+  // primary_mobile_no isn't unique in the schema, so upsert isn't available — skip existing rows instead.
   for (const { roleSlug, ...user } of users) {
     const existing = await prisma.user.findFirst({
-      where: { mobile_no: user.mobile_no },
+      where: { primary_mobile_no: user.primary_mobile_no },
     })
     if (existing) continue
 
