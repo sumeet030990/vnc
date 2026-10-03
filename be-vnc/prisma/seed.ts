@@ -36,7 +36,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Swapnil',
-    primary_mobile_no: '9000000004',
+    primary_mobile_no: '9000000002',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -46,7 +46,7 @@ const users = [
   {
     roleSlug: 'admin',
     name: 'Ayush',
-    primary_mobile_no: '9000000005',
+    primary_mobile_no: '9000000003',
     address: '',
     city: 'Nagpur',
     allow_login: true,
@@ -55,8 +55,8 @@ const users = [
   },
   {
     roleSlug: 'buyer',
-    name: 'Demo Manager',
-    primary_mobile_no: '9000000002',
+    name: 'Demo Buyer',
+    primary_mobile_no: '9000000004',
     address: '2 Sample Street',
     city: 'Nagpur',
     allow_login: false,
@@ -64,7 +64,15 @@ const users = [
   {
     roleSlug: 'seller',
     name: 'Dayalu Dall Mill',
-    primary_mobile_no: '9000000003',
+    primary_mobile_no: '9000000005',
+    address: '',
+    city: 'Nagpur',
+    allow_login: false,
+  },
+  {
+    roleSlug: 'transporter',
+    name: 'Pathak',
+    primary_mobile_no: '9000000006',
     address: '',
     city: 'Nagpur',
     allow_login: false,
@@ -74,7 +82,7 @@ const users = [
 async function main() {
   // Upsert on unique slugs so the seed can be re-run safely.
   for (const role of roles) {
-    await prisma.role.upsert({
+    await prisma.roles.upsert({
       where: { slug: role.slug },
       update: { name: role.name },
       create: role,
@@ -82,7 +90,7 @@ async function main() {
   }
 
   for (const item of items) {
-    await prisma.item.upsert({
+    await prisma.items.upsert({
       where: { slug: item.slug },
       update: { name: item.name },
       create: item,
@@ -91,12 +99,12 @@ async function main() {
 
   // primary_mobile_no isn't unique in the schema, so upsert isn't available — skip existing rows instead.
   for (const { roleSlug, ...user } of users) {
-    const existing = await prisma.user.findFirst({
+    const existing = await prisma.users.findFirst({
       where: { primary_mobile_no: user.primary_mobile_no },
     })
     if (existing) continue
 
-    await prisma.user.create({
+    await prisma.users.create({
       data: {
         ...user,
         password: user.password && (await hashPassword(user.password)),

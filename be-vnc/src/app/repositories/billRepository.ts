@@ -6,10 +6,10 @@ const personSelect = { select: { id: true, name: true } }
 // Bill fields shared by the list and the detail view.
 const billFields = {
   id: true,
+  bill_date: true,
   total_amount: true,
   buyer_commision_amount: true,
   lorry_number: true,
-  lorry_driver_name: true,
   lorry_driver_contact: true,
   freight: true,
   advance_freight: true,
@@ -18,13 +18,13 @@ const billFields = {
   updatedAt: true,
   buyer: personSelect,
   transporter: personSelect,
-} satisfies Prisma.BillSelect
+} satisfies Prisma.BillsSelect
 
 // List rows only show how many items a bill has, not the items themselves.
 const billListSelect = {
   ...billFields,
   _count: { select: { bill_items: true } },
-} satisfies Prisma.BillSelect
+} satisfies Prisma.BillsSelect
 
 // The detail view also sends back every item on the bill.
 const billSelect = {
@@ -44,53 +44,53 @@ const billSelect = {
     },
     orderBy: { id: 'asc' },
   },
-} satisfies Prisma.BillSelect
+} satisfies Prisma.BillsSelect
 
 export function countBills(
-  where: Prisma.BillWhereInput = {},
+  where: Prisma.BillsWhereInput = {},
   db: DbClient = prisma,
 ) {
-  return db.bill.count({ where })
+  return db.bills.count({ where })
 }
 
 export function findBills(
-  where: Prisma.BillWhereInput,
+  where: Prisma.BillsWhereInput,
   skip: number,
   take: number,
   db: DbClient = prisma,
 ) {
-  return db.bill.findMany({
+  return db.bills.findMany({
     where,
     skip,
     take,
     select: billListSelect,
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ bill_date: 'desc' }, { id: 'desc' }],
   })
 }
 
 export function findBillById(id: number, db: DbClient = prisma) {
-  return db.bill.findUnique({ where: { id }, select: billSelect })
+  return db.bills.findUnique({ where: { id }, select: billSelect })
 }
 
 export function findBillIdById(id: number, db: DbClient = prisma) {
-  return db.bill.findUnique({ where: { id }, select: { id: true } })
+  return db.bills.findUnique({ where: { id }, select: { id: true } })
 }
 
 export function createBill(
-  data: Prisma.BillUncheckedCreateInput,
+  data: Prisma.BillsUncheckedCreateInput,
   db: DbClient = prisma,
 ) {
-  return db.bill.create({ data, select: { id: true } })
+  return db.bills.create({ data, select: { id: true } })
 }
 
 export function updateBill(
   id: number,
-  data: Prisma.BillUncheckedUpdateInput,
+  data: Prisma.BillsUncheckedUpdateInput,
   db: DbClient = prisma,
 ) {
-  return db.bill.update({ where: { id }, data, select: { id: true } })
+  return db.bills.update({ where: { id }, data, select: { id: true } })
 }
 
 export function deleteBill(id: number, db: DbClient = prisma) {
-  return db.bill.delete({ where: { id }, select: { id: true } })
+  return db.bills.delete({ where: { id }, select: { id: true } })
 }

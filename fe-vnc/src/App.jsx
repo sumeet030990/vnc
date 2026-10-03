@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import UsersPage from './pages/users/UsersPage.jsx'
 import ItemsPage from './pages/items/ItemsPage.jsx'
+import BillsPage from './pages/bills/BillsPage.jsx'
+import BillFormPage from './pages/bills/BillFormPage.jsx'
 
 function App() {
   return (
@@ -16,10 +18,9 @@ function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route
-            path="/commission-bills"
-            element={<ComingSoonPage title="Commission Bill" />}
-          />
+          <Route path="/commission-bills" element={<BillsPage />} />
+          <Route path="/commission-bills/new" element={<BillFormPage />} />
+          <Route path="/commission-bills/:id/edit" element={<BillFormPage />} />
           <Route path="/reports" element={<ComingSoonPage title="Reports" />} />
           <Route
             path="/sauda-book"

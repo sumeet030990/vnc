@@ -11,22 +11,22 @@ datasource db {
   provider = "mysql"
 }
 
-model Item {
+model Items {
   id         Int          @id @default(autoincrement())
   name       String       @unique
   slug       String       @unique
   bill_items Bill_items[]
 
-  @@map("item")
+  @@map("items")
 }
 
-model Role {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  slug  String @unique
-  users User[]
+model Roles {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  slug  String  @unique
+  users Users[]
 
-  @@map("role")
+  @@map("roles")
 }
 
 model Company {
@@ -50,10 +50,10 @@ model Company {
 }
 
 // Example model — replace with your own
-model User {
+model Users {
   id                  Int          @id @default(autoincrement())
   roleId              Int
-  role                Role         @relation(fields: [roleId], references: [id])
+  role                Roles        @relation(fields: [roleId], references: [id])
   name                String?
   primary_mobile_no   String?
   secondary_mobile_no String?
@@ -67,23 +67,23 @@ model User {
   gst_number          String?
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
-  buyer_bills         Bill[]       @relation("BuyerBills")
+  buyer_bills         Bills[]      @relation("BuyerBills")
   saler_bills         Bill_items[] @relation("SellerBills")
-  transporter_bills   Bill[]       @relation("TransporterBills")
+  transporter_bills   Bills[]      @relation("TransporterBills")
 
-  @@map("user")
+  @@map("users")
 }
 
-model Bill {
+model Bills {
   id                     Int          @id @default(autoincrement())
   buyerId                Int
-  buyer                  User         @relation("BuyerBills", fields: [buyerId], references: [id])
+  buyer                  Users        @relation("BuyerBills", fields: [buyerId], references: [id])
   transporter_id         Int
-  transporter            User         @relation("TransporterBills", fields: [transporter_id], references: [id])
+  transporter            Users        @relation("TransporterBills", fields: [transporter_id], references: [id])
+  bill_date              DateTime     @default(dbgenerated("(curdate())")) @db.Date
   total_amount           Float?
   buyer_commision_amount Float?
   lorry_number           String?
-  lorry_driver_name      String?
   lorry_driver_contact   String?
   freight                Float?
   advance_freight        Float?
@@ -92,21 +92,21 @@ model Bill {
   updatedAt              DateTime     @updatedAt
   bill_items             Bill_items[] @relation("BillItems")
 
-  @@map("bill")
+  @@map("bills")
 }
 
 model Bill_items {
   id                      Int      @id @default(autoincrement())
   bill_id                 Int
-  bill                    Bill     @relation("BillItems", fields: [bill_id], references: [id], onDelete: Cascade)
+  bill                    Bills    @relation("BillItems", fields: [bill_id], references: [id], onDelete: Cascade)
   sellerId                Int
-  seller                  User     @relation("SellerBills", fields: [sellerId], references: [id])
+  seller                  Users    @relation("SellerBills", fields: [sellerId], references: [id])
   itemId                  Int
   seller_bill_no          String?
-  item                    Item     @relation(fields: [itemId], references: [id])
+  item                    Items    @relation(fields: [itemId], references: [id])
   quantity_bags           Int
   packaging               Int
-  weight                  Int
+  weight                  Float
   souda_rate              Float
   amount                  Float
   seller_commision_amount Float?

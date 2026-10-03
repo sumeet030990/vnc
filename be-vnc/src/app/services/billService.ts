@@ -17,7 +17,7 @@ export async function listBills({
   buyerId,
   transporter_id,
 }: ListBillsQuery) {
-  const where: Prisma.BillWhereInput = { buyerId, transporter_id }
+  const where: Prisma.BillsWhereInput = { buyerId, transporter_id }
 
   const [bills, total] = await Promise.all([
     billRepository.findBills(where, (page - 1) * pageSize, pageSize),

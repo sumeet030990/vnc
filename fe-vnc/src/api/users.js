@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { apiFetch } from './client.js'
+import { useRoles } from './roles.js'
 import { statsKeys } from './stats.js'
 
 export const userKeys = {
@@ -22,6 +23,25 @@ export function useUsers(params) {
     queryFn: ({ signal }) => apiFetch(`/api/users?${query}`, { signal }),
     // Keep the current page on screen while the next one loads.
     placeholderData: keepPreviousData,
+  })
+}
+
+const OPTIONS_PAGE_SIZE = 100
+
+// Users with one role (by slug), for pickers that filter in the browser.
+// If that role doesn't exist, falls back to everyone.
+export function useUserOptions(roleSlug) {
+  const roles = useRoles()
+  const roleId = roles.data?.find((role) => role.slug === roleSlug)?.id ?? ''
+  const params = { page: 1, pageSize: OPTIONS_PAGE_SIZE, roleId }
+  const query = new URLSearchParams(
+    Object.entries(params).filter(([, value]) => value !== ''),
+  )
+  return useQuery({
+    queryKey: userKeys.list(params),
+    queryFn: ({ signal }) => apiFetch(`/api/users?${query}`, { signal }),
+    enabled: roles.isSuccess,
+    select: (data) => data.users,
   })
 }
 

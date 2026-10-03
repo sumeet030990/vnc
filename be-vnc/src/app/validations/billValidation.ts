@@ -31,13 +31,19 @@ const queryId = (label: string) =>
     .int({ error: `${label} must be a whole number` })
     .positive({ error: `${label} is invalid` })
 
+// The bill date arrives as 'YYYY-MM-DD' and is saved as a date-only column.
+const billDate = () =>
+  z.iso
+    .date({ error: 'Bill date must be a date like 2026-10-04' })
+    .transform((value) => new Date(value))
+
 const billItemSchema = z.object({
   sellerId: id('Seller'),
   itemId: id('Item'),
   seller_bill_no: optionalText('Seller bill number').optional(),
   quantity_bags: count('Quantity (bags)'),
   packaging: count('Packaging'),
-  weight: count('Weight'),
+  weight: money('Weight'),
   souda_rate: money('Souda rate'),
   amount: money('Amount'),
   seller_commision_amount: money('Seller commission amount')
@@ -72,12 +78,13 @@ export const listBillsQuerySchema = z.object({
 export const createBillSchema = z.object({
   buyerId: id('Buyer'),
   transporter_id: id('Transporter'),
+  // Left out, the database uses today's date.
+  bill_date: billDate().optional(),
   total_amount: money('Total amount').nullable().optional(),
   buyer_commision_amount: money('Buyer commission amount')
     .nullable()
     .optional(),
   lorry_number: optionalText('Lorry number').optional(),
-  lorry_driver_name: optionalText('Lorry driver name').optional(),
   lorry_driver_contact: optionalText('Lorry driver contact').optional(),
   freight: money('Freight').nullable().optional(),
   advance_freight: money('Advance freight').nullable().optional(),
@@ -89,10 +96,10 @@ export const createBillSchema = z.object({
 export const replaceBillSchema = z.object({
   buyerId: id('Buyer'),
   transporter_id: id('Transporter'),
+  bill_date: billDate(),
   total_amount: money('Total amount').nullable(),
   buyer_commision_amount: money('Buyer commission amount').nullable(),
   lorry_number: optionalText('Lorry number'),
-  lorry_driver_name: optionalText('Lorry driver name'),
   lorry_driver_contact: optionalText('Lorry driver contact'),
   freight: money('Freight').nullable(),
   advance_freight: money('Advance freight').nullable(),

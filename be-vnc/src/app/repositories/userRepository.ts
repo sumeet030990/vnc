@@ -13,10 +13,10 @@ const userSelect = {
   createdAt: true,
   updatedAt: true,
   role: { select: { id: true, name: true, slug: true } },
-} satisfies Prisma.UserSelect
+} satisfies Prisma.UsersSelect
 
 export function findLoginUsers(db: DbClient = prisma) {
-  return db.user.findMany({
+  return db.users.findMany({
     where: { allow_login: true },
     select: { id: true, name: true, user_name: true },
     orderBy: { name: 'asc' },
@@ -27,26 +27,26 @@ export function findLoginUserByUserName(
   userName: string,
   db: DbClient = prisma,
 ) {
-  return db.user.findFirst({
+  return db.users.findFirst({
     where: { user_name: userName, allow_login: true },
     include: { role: true },
   })
 }
 
 export function countUsers(
-  where: Prisma.UserWhereInput = {},
+  where: Prisma.UsersWhereInput = {},
   db: DbClient = prisma,
 ) {
-  return db.user.count({ where })
+  return db.users.count({ where })
 }
 
 export function findUsers(
-  where: Prisma.UserWhereInput,
+  where: Prisma.UsersWhereInput,
   skip: number,
   take: number,
   db: DbClient = prisma,
 ) {
-  return db.user.findMany({
+  return db.users.findMany({
     where,
     skip,
     take,
@@ -56,39 +56,39 @@ export function findUsers(
 }
 
 export function findUserById(id: number, db: DbClient = prisma) {
-  return db.user.findUnique({ where: { id }, select: userSelect })
+  return db.users.findUnique({ where: { id }, select: userSelect })
 }
 
 // Only what the service needs to check login rules on update.
 export function findUserLoginStateById(id: number, db: DbClient = prisma) {
-  return db.user.findUnique({
+  return db.users.findUnique({
     where: { id },
     select: { id: true, allow_login: true, user_name: true, password: true },
   })
 }
 
 export function findUserIdByUserName(userName: string, db: DbClient = prisma) {
-  return db.user.findUnique({
+  return db.users.findUnique({
     where: { user_name: userName },
     select: { id: true },
   })
 }
 
 export function createUser(
-  data: Prisma.UserUncheckedCreateInput,
+  data: Prisma.UsersUncheckedCreateInput,
   db: DbClient = prisma,
 ) {
-  return db.user.create({ data, select: userSelect })
+  return db.users.create({ data, select: userSelect })
 }
 
 export function updateUser(
   id: number,
-  data: Prisma.UserUncheckedUpdateInput,
+  data: Prisma.UsersUncheckedUpdateInput,
   db: DbClient = prisma,
 ) {
-  return db.user.update({ where: { id }, data, select: userSelect })
+  return db.users.update({ where: { id }, data, select: userSelect })
 }
 
 export function deleteUser(id: number, db: DbClient = prisma) {
-  return db.user.delete({ where: { id }, select: { id: true } })
+  return db.users.delete({ where: { id }, select: { id: true } })
 }

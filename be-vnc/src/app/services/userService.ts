@@ -72,7 +72,7 @@ export async function listUsers({
   search,
   roleId,
 }: ListUsersQuery) {
-  const where: Prisma.UserWhereInput = {
+  const where: Prisma.UsersWhereInput = {
     roleId,
     ...(search && {
       OR: [

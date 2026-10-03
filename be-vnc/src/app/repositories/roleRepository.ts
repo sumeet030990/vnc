@@ -6,46 +6,46 @@ const roleSelect = {
   id: true,
   name: true,
   slug: true,
-} satisfies Prisma.RoleSelect
+} satisfies Prisma.RolesSelect
 
 export function countRoles(db: DbClient = prisma) {
-  return db.role.count()
+  return db.roles.count()
 }
 
 export function findRoleById(id: number, db: DbClient = prisma) {
-  return db.role.findUnique({ where: { id }, select: roleSelect })
+  return db.roles.findUnique({ where: { id }, select: roleSelect })
 }
 
 export function findRoleIdByName(name: string, db: DbClient = prisma) {
-  return db.role.findUnique({ where: { name }, select: { id: true } })
+  return db.roles.findUnique({ where: { name }, select: { id: true } })
 }
 
 export function findRoleIdBySlug(slug: string, db: DbClient = prisma) {
-  return db.role.findUnique({ where: { slug }, select: { id: true } })
+  return db.roles.findUnique({ where: { slug }, select: { id: true } })
 }
 
 export function findRoles(db: DbClient = prisma) {
-  return db.role.findMany({
+  return db.roles.findMany({
     select: roleSelect,
     orderBy: { name: 'asc' },
   })
 }
 
 export function createRole(
-  data: Prisma.RoleCreateInput,
+  data: Prisma.RolesCreateInput,
   db: DbClient = prisma,
 ) {
-  return db.role.create({ data, select: roleSelect })
+  return db.roles.create({ data, select: roleSelect })
 }
 
 export function updateRole(
   id: number,
-  data: Prisma.RoleUpdateInput,
+  data: Prisma.RolesUpdateInput,
   db: DbClient = prisma,
 ) {
-  return db.role.update({ where: { id }, data, select: roleSelect })
+  return db.roles.update({ where: { id }, data, select: roleSelect })
 }
 
 export function deleteRole(id: number, db: DbClient = prisma) {
-  return db.role.delete({ where: { id }, select: { id: true } })
+  return db.roles.delete({ where: { id }, select: { id: true } })
 }
