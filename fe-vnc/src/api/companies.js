@@ -3,13 +3,24 @@ import { apiFetch } from './client.js'
 
 export const companyKeys = {
   all: ['companies'],
+  detail: (id) => ['companies', id],
 }
+
+// The business that issues the bills is always the first company.
+export const MAIN_COMPANY_ID = 1
 
 // The API sends the full list (sorted by name), so the page searches and pages it locally.
 export function useCompanies() {
   return useQuery({
     queryKey: companyKeys.all,
     queryFn: ({ signal }) => apiFetch('/api/companies', { signal }),
+  })
+}
+
+export function useCompany(id) {
+  return useQuery({
+    queryKey: companyKeys.detail(id),
+    queryFn: ({ signal }) => apiFetch(`/api/companies/${id}`, { signal }),
   })
 }
 

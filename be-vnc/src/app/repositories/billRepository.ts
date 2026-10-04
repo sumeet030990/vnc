@@ -26,9 +26,24 @@ const billListSelect = {
   _count: { select: { bill_items: true } },
 } satisfies Prisma.BillsSelect
 
+// The detail view (and printed bill) also needs the buyer's contact details.
+const buyerDetailSelect = {
+  select: {
+    id: true,
+    name: true,
+    address: true,
+    city: true,
+    state: true,
+    pin_code: true,
+    primary_mobile_no: true,
+    gst_number: true,
+  },
+}
+
 // The detail view also sends back every item on the bill.
 const billSelect = {
   ...billFields,
+  buyer: buyerDetailSelect,
   bill_items: {
     select: {
       id: true,

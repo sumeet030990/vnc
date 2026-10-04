@@ -3,15 +3,12 @@ import { Box, Button, Fade, Snackbar, Stack, Typography } from '@mui/material'
 import Add from '@mui/icons-material/Add'
 import BusinessOutlined from '@mui/icons-material/BusinessOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
-import { useCompanies } from '../../api/companies.js'
+import { MAIN_COMPANY_ID, useCompanies } from '../../api/companies.js'
 import DataTable from '../../components/table/DataTable.jsx'
 import RowActionButton from '../../components/table/RowActionButton.jsx'
 import TableEmptyState from '../../components/table/TableEmptyState.jsx'
 import TableSearchField from '../../components/table/TableSearchField.jsx'
 import CompanyFormDialog from './CompanyFormDialog.jsx'
-
-// The company opened for editing when the page loads.
-const DEFAULT_COMPANY_ID = 1
 
 const SEARCH_FIELDS = ['name', 'city', 'primary_mobile_no', 'gst_number']
 
@@ -74,7 +71,7 @@ function CompaniesPage() {
   if (!autoOpened && companies.data) {
     setAutoOpened(true)
     const mainCompany = companies.data.find(
-      (company) => company.id === DEFAULT_COMPANY_ID,
+      (company) => company.id === MAIN_COMPANY_ID,
     )
     if (mainCompany) openForm(mainCompany)
   }
