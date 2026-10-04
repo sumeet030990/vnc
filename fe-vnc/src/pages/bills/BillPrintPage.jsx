@@ -207,7 +207,14 @@ function BuyerPanel({ buyer }) {
       >
         {/* Contact and state always show (dash when blank); GST and PAN only when saved. */}
         <InfoLine label="Contact" value={buyer?.primary_mobile_no || '—'} />
-        <InfoLine label="State" value={buyer?.state || '—'} />
+        <InfoLine
+          label="State"
+          value={
+            [buyer?.state, buyer?.state_code && `(${buyer.state_code})`]
+              .filter(Boolean)
+              .join(' ') || '—'
+          }
+        />
         <InfoLine label="GSTIN" value={buyer?.gst_number} />
         <InfoLine label="PAN" value={buyer?.pan_number} />
       </Box>

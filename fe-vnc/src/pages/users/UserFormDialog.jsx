@@ -38,6 +38,16 @@ const optionalText = (label) =>
     .trim()
     .max(MAX_TEXT, `${label} must be at most ${MAX_TEXT} characters`)
 
+// States offered in the dropdown, with their GST state codes.
+const STATES = [
+  { name: 'Maharashtra', code: '27' },
+  { name: 'Andhra Pradesh', code: '37' },
+]
+
+// Empty is fine; otherwise it must match `pattern`.
+const optionalPattern = (pattern, message) =>
+  yup.string().trim().matches(pattern, { message, excludeEmptyString: true })
+
 // `isEdit` decides whether a password is needed: on edit, blank keeps the current one.
 const buildSchema = (isEdit) =>
   yup.object({
@@ -47,9 +57,35 @@ const buildSchema = (isEdit) =>
       .trim()
       .required('Please enter a mobile number')
       .matches(/^\+?[0-9]{7,15}$/, 'Mobile number must be 7 to 15 digits'),
+    secondary_mobile_no: optionalPattern(
+      /^\+?[0-9]{7,15}$/,
+      'Secondary mobile number must be 7 to 15 digits',
+    ),
     roleId: yup.number().required('Please select a role'),
-    city: optionalText('City'),
+    gst_number: optionalPattern(
+      /^[0-9A-Za-z]{15}$/,
+      'GST number must be 15 letters and numbers',
+    ),
+    pan_number: optionalPattern(
+      /^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/,
+      'PAN number must be 5 letters, 4 digits, then 1 letter',
+    ),
     address: optionalText('Address'),
+    city: optionalText('City'),
+    state: optionalText('State'),
+    // A GSTIN starts with the state code, so the two must agree.
+    state_code: optionalPattern(
+      /^[0-9]{2}$/,
+      'State code must be 2 digits',
+    ).test(
+      'matches-gst',
+      'State code does not match the GST number',
+      (value, ctx) => {
+        const gst = ctx.parent.gst_number?.trim()
+        return !value || !gst || gst.startsWith(value)
+      },
+    ),
+    pin_code: optionalPattern(/^[0-9]{6}$/, 'Pin code must be 6 digits'),
     allow_login: yup.boolean(),
     user_name: yup
       .string()
@@ -75,9 +111,15 @@ const buildSchema = (isEdit) =>
 const toFormValues = (user) => ({
   name: user?.name ?? '',
   primary_mobile_no: user?.primary_mobile_no ?? '',
+  secondary_mobile_no: user?.secondary_mobile_no ?? '',
   roleId: user?.role?.id ?? '',
-  city: user?.city ?? '',
+  gst_number: user?.gst_number ?? '',
+  pan_number: user?.pan_number ?? '',
   address: user?.address ?? '',
+  city: user?.city ?? '',
+  state: user?.state ?? '',
+  state_code: user?.state_code ?? '',
+  pin_code: user?.pin_code ?? '',
   allow_login: user?.allow_login ?? false,
   user_name: user?.user_name ?? '',
   password: '',
@@ -89,9 +131,15 @@ const orNull = (value) => value.trim() || null
 const toRequestBody = (values) => ({
   name: orNull(values.name),
   primary_mobile_no: values.primary_mobile_no.trim(),
+  secondary_mobile_no: orNull(values.secondary_mobile_no),
   roleId: Number(values.roleId),
-  city: orNull(values.city),
+  gst_number: orNull(values.gst_number.toUpperCase()),
+  pan_number: orNull(values.pan_number.toUpperCase()),
   address: orNull(values.address),
+  city: orNull(values.city),
+  state: orNull(values.state),
+  state_code: orNull(values.state_code),
+  pin_code: orNull(values.pin_code),
   allow_login: values.allow_login,
   user_name: orNull(values.user_name),
   // Only send a password when one was typed and login is on.
@@ -155,6 +203,29 @@ function UserFormDialog({ open, user, onClose, onSaved }) {
     helperText: formik.touched[name] && formik.errors[name],
     fullWidth: true,
   })
+
+  // The first 2 digits of a GSTIN are the state code, so fill it in when blank.
+  const handleGstChange = (event) => {
+    formik.handleChange(event)
+    const prefix = event.target.value.trim().slice(0, 2)
+    if (!formik.values.state_code && /^[0-9]{2}$/.test(prefix)) {
+      formik.setFieldValue('state_code', prefix)
+    }
+  }
+
+  // Picking a state fills in its code; the code can still be changed by hand.
+  const handleStateChange = (event) => {
+    formik.handleChange(event)
+    const match = STATES.find((s) => s.name === event.target.value)
+    if (match) formik.setFieldValue('state_code', match.code)
+  }
+
+  // Keep a saved state that isn't in the list, so editing doesn't hide it.
+  const savedState = user?.state
+  const stateOptions =
+    savedState && !STATES.some((s) => s.name === savedState)
+      ? [...STATES, { name: savedState }]
+      : STATES
 
   const handleClose = () => {
     if (!formik.isSubmitting) onClose()
@@ -256,17 +327,92 @@ function UserFormDialog({ open, user, onClose, onSaved }) {
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField {...fieldProps('city')} label="City" />
-          </Grid>
-          <Grid size={12}>
             <TextField
-              {...fieldProps('address')}
-              label="Address"
-              multiline
-              minRows={2}
+              {...fieldProps('secondary_mobile_no')}
+              label="Secondary mobile"
+              type="tel"
             />
           </Grid>
         </Grid>
+
+        <Box sx={{ mt: 3.5 }}>
+          <SectionLabel>Tax details</SectionLabel>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...fieldProps('gst_number')}
+                onChange={handleGstChange}
+                label="GST number"
+                slotProps={{
+                  htmlInput: { style: { textTransform: 'uppercase' } },
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...fieldProps('pan_number')}
+                label="PAN number"
+                slotProps={{
+                  htmlInput: { style: { textTransform: 'uppercase' } },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Box sx={{ mt: 3.5 }}>
+          <SectionLabel>Address</SectionLabel>
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <TextField
+                {...fieldProps('address')}
+                label="Address"
+                multiline
+                minRows={2}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField {...fieldProps('city')} label="City" />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...fieldProps('pin_code')}
+                label="Pin code"
+                slotProps={{ htmlInput: { inputMode: 'numeric' } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 8 }}>
+              <TextField
+                {...fieldProps('state')}
+                onChange={handleStateChange}
+                label="State"
+                select
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {stateOptions.map((s) => (
+                  <MenuItem key={s.name} value={s.name}>
+                    {s.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                {...fieldProps('state_code')}
+                label="State code"
+                helperText={
+                  (formik.touched.state_code && formik.errors.state_code) ||
+                  'e.g. 27'
+                }
+                slotProps={{
+                  htmlInput: { inputMode: 'numeric', maxLength: 2 },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
 
         <Box sx={{ mt: 3.5 }}>
           <SectionLabel>Login access</SectionLabel>

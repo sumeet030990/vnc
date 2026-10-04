@@ -63,6 +63,7 @@ model Users {
   pin_code            String?
   city                String?
   state               String?
+  state_code          String?
   allow_login         Boolean @default(false)
   user_name           String? @unique
   password            String?

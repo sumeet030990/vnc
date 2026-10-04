@@ -80,6 +80,8 @@ export async function listUsers({
         { user_name: { contains: search } },
         { primary_mobile_no: { contains: search } },
         { city: { contains: search } },
+        { state: { contains: search } },
+        { gst_number: { contains: search } },
       ],
     }),
   }
@@ -124,7 +126,20 @@ async function ensureUserNameIsFree(userName?: string | null, userId?: number) {
   }
 }
 
+// A GSTIN starts with the 2-digit state code, so the two must agree.
+// Only checked when both are sent in the same request.
+function ensureGstMatchesStateCode(
+  gstNumber?: string | null,
+  stateCode?: string | null,
+) {
+  if (!gstNumber || !stateCode) return
+  if (!gstNumber.startsWith(stateCode)) {
+    throw new HttpError(400, 'GST number does not match the state code')
+  }
+}
+
 export async function createUser(input: CreateUserInput) {
+  ensureGstMatchesStateCode(input.gst_number, input.state_code)
   ensureLoginDetails(
     input.allow_login ?? false,
     input.user_name,
@@ -147,6 +162,8 @@ export async function updateUser(
   if (!existing) {
     throw new HttpError(404, 'User not found')
   }
+
+  ensureGstMatchesStateCode(input.gst_number, input.state_code)
 
   // `undefined` means the field wasn't sent (PATCH), so fall back to the stored value.
   ensureLoginDetails(

@@ -83,6 +83,32 @@ function NameCell({ user, isSelf }) {
   )
 }
 
+// City on top, state and its code underneath.
+function LocationCell({ user }) {
+  const state = [user.state, user.state_code && `(${user.state_code})`]
+    .filter(Boolean)
+    .join(' ')
+  if (!user.city && !state) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        —
+      </Typography>
+    )
+  }
+  return (
+    <Box sx={{ minWidth: 0 }}>
+      <Typography variant="body2" noWrap>
+        {user.city || state}
+      </Typography>
+      {user.city && state && (
+        <Typography variant="caption" color="text.secondary" noWrap>
+          {state}
+        </Typography>
+      )}
+    </Box>
+  )
+}
+
 function LoginStatus({ allowed }) {
   return (
     <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -201,13 +227,21 @@ function UsersPage() {
         ),
       },
       {
-        accessorKey: 'city',
-        header: 'City',
-        size: 140,
+        id: 'location',
+        accessorFn: (user) => user.city,
+        header: 'Location',
+        size: 180,
+        Cell: ({ row }) => <LocationCell user={row.original} />,
+      },
+      {
+        accessorKey: 'gst_number',
+        header: 'GSTIN',
+        size: 170,
         Cell: ({ cell }) => (
           <Typography
             variant="body2"
             color={cell.getValue() ? 'text.primary' : 'text.secondary'}
+            sx={{ fontVariantNumeric: 'tabular-nums' }}
           >
             {cell.getValue() || '—'}
           </Typography>

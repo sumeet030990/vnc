@@ -34,6 +34,7 @@ const partyDetailSelect = {
     address: true,
     city: true,
     state: true,
+    state_code: true,
     pin_code: true,
     primary_mobile_no: true,
     gst_number: true,

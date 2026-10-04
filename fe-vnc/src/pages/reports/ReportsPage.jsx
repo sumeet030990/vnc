@@ -109,6 +109,7 @@ function PartyPanel({ title, party, from, to }) {
             sx={{ flexWrap: 'wrap', columnGap: 3, rowGap: 0.25, mt: 1 }}
           >
             <InfoLine label="Contact" value={party.primary_mobile_no} />
+            <InfoLine label="State code" value={party.state_code} />
             <InfoLine label="GSTIN" value={party.gst_number} />
             <InfoLine label="PAN" value={party.pan_number} />
           </Stack>

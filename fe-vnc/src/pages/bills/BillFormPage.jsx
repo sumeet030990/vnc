@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Fade,
   Grid,
   IconButton,
@@ -335,12 +334,6 @@ function BillForm({ bill }) {
                 <SummaryLine
                   label="Additional expense"
                   value={formatMoney(additionalExpense)}
-                />
-                <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
-                <SummaryLine
-                  label="Total bill"
-                  value={formatMoney(itemsTotal + additionalExpense)}
-                  strong
                 />
               </Stack>
             </Paper>

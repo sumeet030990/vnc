@@ -19,6 +19,46 @@ const mobileNo = z
   .trim()
   .regex(/^\+?[0-9]{7,15}$/, { error: 'Mobile number must be 7 to 15 digits' })
 
+const optionalMobileNo = (label: string) =>
+  z
+    .string({ error: `${label} must be text` })
+    .trim()
+    .regex(/^\+?[0-9]{7,15}$/, { error: `${label} must be 7 to 15 digits` })
+    .nullable()
+
+const pinCode = z
+  .string({ error: 'Pin code must be text' })
+  .trim()
+  .regex(/^[0-9]{6}$/, { error: 'Pin code must be 6 digits' })
+  .nullable()
+
+// GST state code is 2 digits (e.g. 27 for Maharashtra).
+const stateCode = z
+  .string({ error: 'State code must be text' })
+  .trim()
+  .regex(/^[0-9]{2}$/, { error: 'State code must be 2 digits' })
+  .nullable()
+
+// GSTIN is 15 letters and numbers. Stored in upper case.
+const gstNumber = z
+  .string({ error: 'GST number must be text' })
+  .trim()
+  .toUpperCase()
+  .regex(/^[0-9A-Z]{15}$/, {
+    error: 'GST number must be 15 letters and numbers',
+  })
+  .nullable()
+
+// PAN is 5 letters, 4 digits, then 1 letter (e.g. ABCDE1234F). Stored in upper case.
+const panNumber = z
+  .string({ error: 'PAN number must be text' })
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, {
+    error: 'PAN number must be 5 letters, 4 digits, then 1 letter',
+  })
+  .nullable()
+
 const allowLogin = z.boolean({ error: 'Allow login must be true or false' })
 
 const userName = z
@@ -68,8 +108,14 @@ export const createUserSchema = z.object({
   roleId,
   name: optionalText('Name').optional(),
   primary_mobile_no: mobileNo,
+  secondary_mobile_no: optionalMobileNo('Secondary mobile number').optional(),
   address: optionalText('Address').optional(),
   city: optionalText('City').optional(),
+  state: optionalText('State').optional(),
+  state_code: stateCode.optional(),
+  pin_code: pinCode.optional(),
+  gst_number: gstNumber.optional(),
+  pan_number: panNumber.optional(),
   allow_login: allowLogin.optional(),
   user_name: userName.optional(),
   password: password.optional(),
@@ -81,8 +127,14 @@ export const replaceUserSchema = z.object({
   roleId,
   name: optionalText('Name'),
   primary_mobile_no: mobileNo,
+  secondary_mobile_no: optionalMobileNo('Secondary mobile number'),
   address: optionalText('Address'),
   city: optionalText('City'),
+  state: optionalText('State'),
+  state_code: stateCode,
+  pin_code: pinCode,
+  gst_number: gstNumber,
+  pan_number: panNumber,
   allow_login: allowLogin,
   user_name: userName,
   password: password.optional(),
