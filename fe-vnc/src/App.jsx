@@ -26,10 +26,6 @@ function App() {
           <Route path="/commission-bills/new" element={<BillFormPage />} />
           <Route path="/commission-bills/:id/edit" element={<BillFormPage />} />
           <Route path="/reports" element={<ComingSoonPage title="Reports" />} />
-          <Route
-            path="/sauda-book"
-            element={<ComingSoonPage title="Sauda Book" />}
-          />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/companies" element={<CompaniesPage />} />

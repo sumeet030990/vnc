@@ -4,7 +4,6 @@ import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import BusinessOutlined from '@mui/icons-material/BusinessOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import AssessmentOutlined from '@mui/icons-material/AssessmentOutlined'
-import MenuBookOutlined from '@mui/icons-material/MenuBookOutlined'
 
 // Everyday pages: shown as links in the top bar.
 export const NAV_ITEMS = [
@@ -22,11 +21,6 @@ export const NAV_ITEMS = [
     to: '/reports',
     label: 'Reports',
     icon: AssessmentOutlined,
-  },
-  {
-    to: '/sauda-book',
-    label: 'Sauda Book',
-    icon: MenuBookOutlined,
   },
 ]
 

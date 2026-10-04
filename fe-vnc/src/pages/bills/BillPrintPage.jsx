@@ -57,7 +57,9 @@ const PAGE_MARGIN = '12mm'
 const printStyles = (
   <GlobalStyles
     styles={{
-      '@page': { size: 'A4', margin: PAGE_MARGIN },
+      // No page margin, so the browser has no room to print its own
+      // date, title and URL. The bill adds the white border itself (below).
+      '@page': { size: 'A4', margin: 0 },
       '@media print': {
         // Print the grey row shading too (browsers skip backgrounds by default).
         body: {
@@ -85,7 +87,7 @@ function SectionLabel({ children }) {
       variant="overline"
       color="text.secondary"
       component="p"
-      sx={{ lineHeight: 1.6, mb: 0.75 }}
+      sx={{ lineHeight: 1.6, mb: 0.5 }}
     >
       {children}
     </Typography>
@@ -112,7 +114,8 @@ const panelSx = {
   border: 1,
   borderColor: LINE,
   borderRadius: '8px',
-  p: 2,
+  px: 2,
+  py: 1.5,
   breakInside: 'avoid',
 }
 
@@ -127,14 +130,14 @@ function CompanyHeader({ company, bill }) {
     .join(', ')
 
   return (
-    <Box sx={{ pb: 1.5, borderBottom: 2, borderColor: INK }}>
+    <Box sx={{ pb: 1, borderBottom: 2, borderColor: INK }}>
       {/* Company details, centred */}
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h5" component="p" sx={{ mb: 0.5, color: INK }}>
           {company?.name || APP_NAME}
         </Typography>
         {address && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
             {address}
           </Typography>
         )}
@@ -160,7 +163,7 @@ function CompanyHeader({ company, bill }) {
         sx={{
           justifyContent: 'space-between',
           alignItems: 'baseline',
-          mt: 2.5,
+          mt: 1.5,
         }}
       >
         <Typography variant="h6" component="h1" sx={{ color: INK }}>
@@ -199,7 +202,7 @@ function BuyerPanel({ buyer }) {
           gridTemplateColumns: '1fr 1fr',
           columnGap: 3,
           rowGap: 0.25,
-          mt: 1,
+          mt: 0.5,
         }}
       >
         {/* Contact and state always show (dash when blank); GST and PAN only when saved. */}
@@ -226,7 +229,7 @@ function TransportPanel({ bill }) {
           columnGap: 3,
         }}
       >
-        <Stack spacing={0.5} sx={{ pt: 0.6 }}>
+        <Stack spacing={0.5} sx={{ pt: 0.4 }}>
           <InfoLine label="Transporter" value={bill.transporter?.name || '—'} />
           <InfoLine label="Lorry number" value={bill.lorry_number || '—'} />
           <InfoLine
@@ -256,10 +259,10 @@ function SummaryRow({ label, value, strong = false }) {
       direction="row"
       sx={{
         justifyContent: 'space-between',
-        py: 0.6,
+        py: 0.4,
         ...(strong && {
-          mt: 1,
-          pt: 1.25,
+          mt: 0.75,
+          pt: 1,
           borderTop: '3px double',
           borderColor: INK,
         }),
@@ -298,9 +301,8 @@ const ITEM_COLUMNS = [
   { label: 'Amount' },
 ]
 
-// The items table is at least this tall, so the transport box and signature
-// sit in the same place on every bill. More items simply make it taller.
-const ITEMS_MIN_HEIGHT = '100mm'
+// The items table stretches to fill the A4 sheet, but never gets shorter than this.
+const ITEMS_MIN_HEIGHT = '60mm'
 
 const numericCell = { fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }
 
@@ -313,23 +315,29 @@ function ItemsTable({ items }) {
         borderColor: INK,
         borderRadius: '8px',
         overflow: 'hidden',
+        // Take all the height left on the sheet, so the signature lands at the bottom.
+        // Never shrink, or a long bill would get cut off instead of going to page 2.
+        flex: '1 0 auto',
+        minHeight: ITEMS_MIN_HEIGHT,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <Table
         size="small"
         sx={{
-          // A table treats height as a minimum; the spacer row takes the extra space.
-          height: ITEMS_MIN_HEIGHT,
+          // The table grows to fill the box; the spacer row takes the extra space.
+          flex: '1 0 auto',
           '& td, & th': {
             px: 1,
-            py: 0.9,
+            py: 0.75,
             borderBottom: 1,
             borderRight: 1,
             borderColor: LINE,
           },
           '& td:last-of-type, & th:last-of-type': { borderRight: 0 },
           // Body rows: a little taller, and no lines between them (only column lines).
-          '& tbody td': { py: 1.25, borderBottom: 0 },
+          '& tbody td': { py: 1, borderBottom: 0 },
         }}
       >
         <TableHead sx={{ display: 'table-header-group' }}>
@@ -433,6 +441,9 @@ function BillDocument({ bill, company }) {
         boxSizing: 'border-box',
         width: PAGE_WIDTH,
         minHeight: PAGE_HEIGHT,
+        // A column that fills the sheet: the items table takes the spare height.
+        display: 'flex',
+        flexDirection: 'column',
         mx: 'auto',
         p: PAGE_MARGIN,
         bgcolor: 'background.paper',
@@ -440,22 +451,23 @@ function BillDocument({ bill, company }) {
         boxShadow: (t) => t.customShadows.md,
         '@media print': {
           width: 'auto',
-          minHeight: 0,
+          // A hair under 297mm, so rounding never pushes a blank second page.
+          minHeight: `calc(${PAGE_HEIGHT} - 1mm)`,
           boxShadow: 'none',
           borderRadius: 0,
-          p: 0,
+          p: PAGE_MARGIN,
         },
       }}
     >
       <CompanyHeader company={company} bill={bill} />
 
-      <Box sx={{ my: 3 }}>
+      <Box sx={{ my: 2 }}>
         <BuyerPanel buyer={bill.buyer} />
       </Box>
 
       <ItemsTable items={bill.bill_items} />
 
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 2 }}>
         <TransportPanel bill={bill} />
       </Box>
 
@@ -464,7 +476,7 @@ function BillDocument({ bill, company }) {
         sx={{
           display: 'flex',
           justifyContent: 'flex-end',
-          mt: 6,
+          mt: 2,
           breakInside: 'avoid',
         }}
       >
@@ -474,7 +486,7 @@ function BillDocument({ bill, company }) {
           </Typography>
           <Box
             sx={{
-              mt: 7,
+              mt: 5,
               borderTop: 1,
               borderColor: INK,
               pt: 1,
