@@ -43,7 +43,7 @@ function Section({ title, subtitle, children, sx }) {
       elevation={0}
       sx={[
         (t) => ({
-          p: 3,
+          p: { xs: 2, sm: 3 },
           borderRadius: '12px',
           border: `1px solid ${alpha(t.palette.primary.main, 0.05)}`,
           boxShadow: t.customShadows.md,
@@ -204,7 +204,11 @@ function BillForm({ bill }) {
               aria-label="Back to bills"
               // Mouse only, so the first Tab stop is the buyer.
               tabIndex={-1}
-              sx={{ mt: 2.5, color: 'text.secondary' }}
+              sx={{
+                mt: 2.5,
+                ml: { xs: -1, sm: 0 },
+                color: 'text.secondary',
+              }}
             >
               <ArrowBack />
             </IconButton>
@@ -312,7 +316,7 @@ function BillForm({ bill }) {
             <Paper
               elevation={0}
               sx={(t) => ({
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 height: '100%',
                 borderRadius: '12px',
                 bgcolor: 'primary.main',
@@ -345,10 +349,10 @@ function BillForm({ bill }) {
           elevation={0}
           sx={(t) => ({
             position: 'sticky',
-            bottom: 16,
+            bottom: { xs: 8, sm: 16 },
             zIndex: 2,
-            px: 3,
-            py: 1.75,
+            px: { xs: 2, sm: 3 },
+            py: { xs: 1.5, sm: 1.75 },
             borderRadius: '12px',
             border: `1px solid ${alpha(t.palette.primary.main, 0.06)}`,
             boxShadow: t.customShadows.lg,
@@ -357,11 +361,23 @@ function BillForm({ bill }) {
           })}
         >
           <Stack
-            direction="row"
-            spacing={2}
-            sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 1, sm: 2 }}
+            sx={{
+              alignItems: { xs: 'stretch', sm: 'center' },
+              justifyContent: 'space-between',
+            }}
           >
-            <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Box
+              sx={{
+                minWidth: 0,
+                flex: 1,
+                // The keyboard hint means nothing on a phone; errors still show.
+                display: mutation.isError
+                  ? 'block'
+                  : { xs: 'none', sm: 'block' },
+              }}
+            >
               {mutation.isError ? (
                 <Typography variant="body2" color="error" noWrap>
                   {mutation.error.message}
@@ -387,26 +403,30 @@ function BillForm({ bill }) {
                 </Typography>
               )}
             </Box>
-            <Button
-              component={RouterLink}
-              to={LIST_PATH}
-              variant="outlined"
-              color="inherit"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting
-                ? 'Saving…'
-                : isEdit
-                  ? 'Save changes'
-                  : 'Save bill'}
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                component={RouterLink}
+                to={LIST_PATH}
+                variant="outlined"
+                color="inherit"
+                sx={{ flex: { xs: 1, sm: 'none' } }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={formik.isSubmitting}
+                sx={{ flex: { xs: 2, sm: 'none' } }}
+              >
+                {formik.isSubmitting
+                  ? 'Saving…'
+                  : isEdit
+                    ? 'Save changes'
+                    : 'Save bill'}
+              </Button>
+            </Stack>
           </Stack>
         </Paper>
       </Stack>

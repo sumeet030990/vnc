@@ -6,6 +6,7 @@ const optionLabel = (option) => option?.name || `#${option?.id}`
 // first match is highlighted, then Tab picks it and moves to the next field.
 // `options` and `value` are { id, name } objects.
 // `getOptionNote` (optional) adds small grey text on the right of each option.
+// `dense` is for table cells: small and no visible label. `size` overrides it.
 function OptionPicker({
   id,
   label,
@@ -19,6 +20,7 @@ function OptionPicker({
   required = false,
   autoFocus = false,
   dense = false,
+  size = dense ? 'small' : 'medium',
   inputRef,
   getOptionNote,
 }) {
@@ -36,7 +38,7 @@ function OptionPicker({
       autoSelect
       selectOnFocus
       handleHomeEndKeys
-      size={dense ? 'small' : 'medium'}
+      size={size}
       fullWidth
       renderOption={(props, option) => {
         // Names can repeat, so key on the id instead of MUI's label key.
