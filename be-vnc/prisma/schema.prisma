@@ -42,6 +42,7 @@ model Company {
   city                        String?
   state                       String?
   gst_number                  String?
+  pan_number                  String?
   seller_commision_percentage Float?
   buyer_commision_percentage  Float?
   createdAt                   DateTime @default(now())
@@ -52,9 +53,9 @@ model Company {
 
 // Example model — replace with your own
 model Users {
-  id                  Int          @id @default(autoincrement())
+  id                  Int     @id @default(autoincrement())
   roleId              Int
-  role                Roles        @relation(fields: [roleId], references: [id])
+  role                Roles   @relation(fields: [roleId], references: [id])
   name                String?
   primary_mobile_no   String?
   secondary_mobile_no String?
@@ -62,15 +63,17 @@ model Users {
   pin_code            String?
   city                String?
   state               String?
-  allow_login         Boolean      @default(false)
-  user_name           String?      @unique
+  allow_login         Boolean @default(false)
+  user_name           String? @unique
   password            String?
   gst_number          String?
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-  buyer_bills         Bills[]      @relation("BuyerBills")
-  saler_bills         Bill_items[] @relation("SellerBills")
-  transporter_bills   Bills[]      @relation("TransporterBills")
+  pan_number          String?
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  buyer_bills       Bills[]      @relation("BuyerBills")
+  saler_bills       Bill_items[] @relation("SellerBills")
+  transporter_bills Bills[]      @relation("TransporterBills")
 
   @@map("users")
 }
@@ -83,12 +86,12 @@ model Bills {
   transporter            Users        @relation("TransporterBills", fields: [transporter_id], references: [id])
   bill_date              DateTime     @default(dbgenerated("(curdate())")) @db.Date
   total_amount           Float
-  buyer_commision_amount Float  @default(0)
+  buyer_commision_amount Float        @default(0)
   lorry_number           String?
   lorry_driver_contact   String?
-  freight                Float  @default(0)
-  advance_freight        Float  @default(0)
-  lorry_brokerage        Float  @default(0)
+  freight                Float        @default(0)
+  advance_freight        Float        @default(0)
+  lorry_brokerage        Float        @default(0)
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
   bill_items             Bill_items[] @relation("BillItems")
@@ -110,7 +113,7 @@ model Bill_items {
   weight                  Float
   souda_rate              Float
   amount                  Float
-  seller_commision_amount Float  @default(0)
+  seller_commision_amount Float    @default(0)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 

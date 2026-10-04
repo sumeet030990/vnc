@@ -75,6 +75,13 @@ const schema = yup.object({
       message: 'GST number must be 15 letters and numbers',
       excludeEmptyString: true,
     }),
+  pan_number: yup
+    .string()
+    .trim()
+    .matches(/^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/, {
+      message: 'PAN number must be 5 letters, 4 digits, then 1 letter',
+      excludeEmptyString: true,
+    }),
   seller_commision_percentage: percentage('Seller commission'),
   buyer_commision_percentage: percentage('Buyer commission'),
 })
@@ -90,6 +97,7 @@ const TEXT_FIELDS = [
   'state',
   'pin_code',
   'gst_number',
+  'pan_number',
 ]
 const PERCENT_FIELDS = [
   'seller_commision_percentage',
@@ -110,6 +118,7 @@ const toRequestBody = (values) => ({
     TEXT_FIELDS.map((field) => [field, values[field].trim() || null]),
   ),
   gst_number: values.gst_number.trim().toUpperCase() || null,
+  pan_number: values.pan_number.trim().toUpperCase() || null,
   ...Object.fromEntries(
     PERCENT_FIELDS.map((field) => [
       field,
@@ -256,6 +265,9 @@ function CompanyFormDialog({ open, company, onClose, onSaved }) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField {...fieldProps('gst_number')} label="GST number" />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField {...fieldProps('pan_number')} label="PAN number" />
           </Grid>
         </Grid>
 

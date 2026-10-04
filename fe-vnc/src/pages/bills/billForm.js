@@ -107,9 +107,8 @@ export const toNumber = (value) => {
   return value === '' || Number.isNaN(parsed) ? 0 : parsed
 }
 
-// The API wants null (not '') for empty optional values.
+// The API wants null (not '') for empty optional text.
 const textOrNull = (value) => value.trim() || null
-const numberOrNull = (value) => (value === '' ? null : Number(value))
 
 export const sumBy = (rows, field) =>
   rows.reduce((total, row) => total + toNumber(row[field]), 0)
@@ -157,18 +156,19 @@ export const buyerCommissionFor = (rows) =>
     : ''
 
 // Every field is sent, so the same body works for POST and PUT.
+// Blank amounts are sent as 0, since the API doesn't accept null for them.
 export const toRequestBody = (values) => ({
   buyerId: values.buyer.id,
   transporter_id: values.transporter.id,
   bill_date: values.bill_date,
   // The bill total is the sum of its item amounts.
   total_amount: sumBy(values.bill_items, 'amount'),
-  buyer_commision_amount: numberOrNull(values.buyer_commision_amount),
+  buyer_commision_amount: toNumber(values.buyer_commision_amount),
   lorry_number: textOrNull(values.lorry_number),
   lorry_driver_contact: textOrNull(values.lorry_driver_contact),
-  freight: numberOrNull(values.freight),
-  advance_freight: numberOrNull(values.advance_freight),
-  lorry_brokerage: numberOrNull(values.lorry_brokerage),
+  freight: toNumber(values.freight),
+  advance_freight: toNumber(values.advance_freight),
+  lorry_brokerage: toNumber(values.lorry_brokerage),
   bill_items: values.bill_items.map((row) => ({
     sellerId: row.seller.id,
     itemId: row.item.id,
@@ -178,7 +178,7 @@ export const toRequestBody = (values) => ({
     weight: Number(row.weight),
     souda_rate: Number(row.souda_rate),
     amount: Number(row.amount),
-    seller_commision_amount: numberOrNull(row.seller_commision_amount),
+    seller_commision_amount: toNumber(row.seller_commision_amount),
   })),
 })
 

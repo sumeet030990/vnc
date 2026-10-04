@@ -10,9 +10,24 @@ import TableEmptyState from '../../components/table/TableEmptyState.jsx'
 import TableSearchField from '../../components/table/TableSearchField.jsx'
 import CompanyFormDialog from './CompanyFormDialog.jsx'
 
-const SEARCH_FIELDS = ['name', 'city', 'primary_mobile_no', 'gst_number']
+const SEARCH_FIELDS = [
+  'name',
+  'city',
+  'primary_mobile_no',
+  'gst_number',
+  'pan_number',
+]
 
 const formatPercent = (value) => (value == null ? '—' : `${value}%`)
+
+// GST and PAN on one line under the name, e.g. "GST 27AAA… · PAN ABCDE1234F".
+const taxIds = (company) =>
+  [
+    company.gst_number && `GST ${company.gst_number}`,
+    company.pan_number && `PAN ${company.pan_number}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
 function MutedCell({ value }) {
   return (
@@ -87,13 +102,13 @@ function CompaniesPage() {
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {row.original.name}
             </Typography>
-            {row.original.gst_number && (
+            {taxIds(row.original) && (
               <Typography
                 variant="caption"
                 color="text.secondary"
                 sx={{ fontFamily: 'monospace' }}
               >
-                GST {row.original.gst_number}
+                {taxIds(row.original)}
               </Typography>
             )}
           </Box>

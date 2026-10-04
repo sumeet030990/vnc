@@ -46,9 +46,8 @@ const billItemSchema = z.object({
   weight: money('Weight'),
   souda_rate: money('Souda rate'),
   amount: money('Amount'),
-  seller_commision_amount: money('Seller commission amount')
-    .nullable()
-    .optional(),
+  // Left out, the database saves 0.
+  seller_commision_amount: money('Seller commission amount').optional(),
 })
 
 const billItems = z
@@ -80,15 +79,14 @@ export const createBillSchema = z.object({
   transporter_id: id('Transporter'),
   // Left out, the database uses today's date.
   bill_date: billDate().optional(),
-  total_amount: money('Total amount').nullable().optional(),
-  buyer_commision_amount: money('Buyer commission amount')
-    .nullable()
-    .optional(),
+  total_amount: money('Total amount'),
+  // Left out, the database saves 0 for these amounts.
+  buyer_commision_amount: money('Buyer commission amount').optional(),
   lorry_number: optionalText('Lorry number').optional(),
   lorry_driver_contact: optionalText('Lorry driver contact').optional(),
-  freight: money('Freight').nullable().optional(),
-  advance_freight: money('Advance freight').nullable().optional(),
-  lorry_brokerage: money('Lorry brokerage').nullable().optional(),
+  freight: money('Freight').optional(),
+  advance_freight: money('Advance freight').optional(),
+  lorry_brokerage: money('Lorry brokerage').optional(),
   bill_items: billItems,
 })
 
@@ -97,13 +95,13 @@ export const replaceBillSchema = z.object({
   buyerId: id('Buyer'),
   transporter_id: id('Transporter'),
   bill_date: billDate(),
-  total_amount: money('Total amount').nullable(),
-  buyer_commision_amount: money('Buyer commission amount').nullable(),
+  total_amount: money('Total amount'),
+  buyer_commision_amount: money('Buyer commission amount'),
   lorry_number: optionalText('Lorry number'),
   lorry_driver_contact: optionalText('Lorry driver contact'),
-  freight: money('Freight').nullable(),
-  advance_freight: money('Advance freight').nullable(),
-  lorry_brokerage: money('Lorry brokerage').nullable(),
+  freight: money('Freight'),
+  advance_freight: money('Advance freight'),
+  lorry_brokerage: money('Lorry brokerage'),
   bill_items: billItems,
 })
 

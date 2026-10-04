@@ -37,6 +37,7 @@ const buyerDetailSelect = {
     pin_code: true,
     primary_mobile_no: true,
     gst_number: true,
+    pan_number: true,
   },
 }
 

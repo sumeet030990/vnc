@@ -72,7 +72,7 @@ function Detail({ label, value, align = 'left' }) {
   )
 }
 
-// Buyer name with their address, contact, state and GST number below.
+// Buyer name with their address, contact, state, GST and PAN number below.
 function BuyerDetail({ buyer }) {
   const lines = [
     formatAddress({
@@ -83,6 +83,7 @@ function BuyerDetail({ buyer }) {
     buyer?.primary_mobile_no && `Contact: ${buyer.primary_mobile_no}`,
     buyer?.state && `State: ${buyer.state}`,
     buyer?.gst_number && `GST: ${buyer.gst_number}`,
+    buyer?.pan_number && `PAN: ${buyer.pan_number}`,
   ].filter(Boolean)
 
   return (

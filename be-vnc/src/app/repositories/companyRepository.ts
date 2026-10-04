@@ -14,6 +14,7 @@ const companySelect = {
   city: true,
   state: true,
   gst_number: true,
+  pan_number: true,
   seller_commision_percentage: true,
   buyer_commision_percentage: true,
   createdAt: true,

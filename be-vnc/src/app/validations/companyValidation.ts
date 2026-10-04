@@ -45,6 +45,16 @@ const gstNumber = z
   })
   .nullable()
 
+// PAN is 5 letters, 4 digits, then 1 letter (e.g. ABCDE1234F). Stored in upper case.
+const panNumber = z
+  .string({ error: 'PAN number must be text' })
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, {
+    error: 'PAN number must be 5 letters, 4 digits, then 1 letter',
+  })
+  .nullable()
+
 const percentage = (label: string) =>
   z
     .number({ error: `${label} must be a number` })
@@ -71,6 +81,7 @@ export const replaceCompanySchema = z.object({
   city: optionalText('City'),
   state: optionalText('State'),
   gst_number: gstNumber,
+  pan_number: panNumber,
   seller_commision_percentage: percentage('Seller commission percentage'),
   buyer_commision_percentage: percentage('Buyer commission percentage'),
 })
