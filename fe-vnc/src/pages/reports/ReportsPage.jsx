@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import AssessmentOutlined from '@mui/icons-material/AssessmentOutlined'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
+import { MAIN_COMPANY_ID, useCompany } from '../../api/companies.js'
 import { useReport } from '../../api/reports.js'
 import { useUserOptions } from '../../api/users.js'
 import TableEmptyState from '../../components/table/TableEmptyState.jsx'
@@ -26,6 +27,7 @@ import {
   formatDate,
   formatMoney,
   formatWeight,
+  tdsAmount,
 } from './reportFormat.js'
 
 const REPORT_TYPES = {
@@ -34,6 +36,26 @@ const REPORT_TYPES = {
   },
   seller: {
     person: 'Seller',
+  },
+}
+
+// The pages built on this report: who can be picked, and the wording.
+const PAGES = {
+  users: {
+    title: 'User Reports',
+    intro: 'Pick a buyer or seller to see everyone they traded with.',
+    roles: ['buyer', 'seller'],
+    pickerLabel: 'Buyer or seller',
+    reportTitle: (type) => `${REPORT_TYPES[type].person} report`,
+  },
+  tds: {
+    title: 'TDS Report',
+    intro: 'Pick a seller to see everyone they traded with.',
+    roles: ['seller'],
+    pickerLabel: 'Seller',
+    reportTitle: () => 'TDS report',
+    // Only money: the amount and the TDS on it (main company's TDS %).
+    tds: true,
   },
 }
 
@@ -172,36 +194,46 @@ function TotalTiles({ tiles }) {
   )
 }
 
-function ReportBody({ type, report, from, to }) {
-  const config = REPORT_TYPES[type]
+function ReportBody({ type, title, tds, tdsPercent, report, from, to }) {
   const isBuyer = type === 'buyer'
   const party = isBuyer ? report.buyer : report.seller
-  const { totals } = report
   const rowCount = isBuyer ? report.bills.length : report.items.length
+  // Total TDS adds up the rounded row values, so it matches the table.
+  const totals =
+    tds && tdsPercent != null
+      ? {
+          ...report.totals,
+          tds_amount: report.items.reduce(
+            (sum, item) => sum + tdsAmount(item.amount, tdsPercent),
+            0,
+          ),
+        }
+      : report.totals
 
-  const tiles = [
-    { label: 'Bills', value: formatCount(totals.bills) },
-    { label: 'Bags', value: formatCount(totals.quantity_bags) },
-    { label: 'Quintal', value: formatWeight(totals.weight) },
-    { label: 'Amount', value: formatMoney(totals.amount) },
-    {
-      label: 'Commission',
-      value: formatMoney(
-        isBuyer
-          ? totals.buyer_commision_amount
-          : totals.seller_commision_amount,
-      ),
-    },
-  ]
+  const tiles = tds
+    ? [
+        { label: 'Bills', value: formatCount(totals.bills) },
+        { label: 'Amount', value: formatMoney(totals.amount) },
+        { label: 'TDS', value: formatMoney(totals.tds_amount) },
+      ]
+    : [
+        { label: 'Bills', value: formatCount(totals.bills) },
+        { label: 'Bags', value: formatCount(totals.quantity_bags) },
+        { label: 'Quintal', value: formatWeight(totals.weight) },
+        { label: 'Amount', value: formatMoney(totals.amount) },
+        {
+          label: 'Commission',
+          value: formatMoney(
+            isBuyer
+              ? totals.buyer_commision_amount
+              : totals.seller_commision_amount,
+          ),
+        },
+      ]
 
   return (
     <Stack spacing={3}>
-      <PartyPanel
-        title={`${config.person} report`}
-        party={party}
-        from={from}
-        to={to}
-      />
+      <PartyPanel title={title} party={party} from={from} to={to} />
       {rowCount === 0 ? (
         <Paper elevation={3} sx={{ borderRadius: '12px' }}>
           <TableEmptyState
@@ -216,7 +248,12 @@ function ReportBody({ type, report, from, to }) {
           {isBuyer ? (
             <BuyerReportTable bills={report.bills} totals={totals} />
           ) : (
-            <SellerReportTable items={report.items} totals={totals} />
+            <SellerReportTable
+              items={report.items}
+              totals={totals}
+              tds={tds}
+              tdsPercent={tdsPercent}
+            />
           )}
         </>
       )}
@@ -224,29 +261,36 @@ function ReportBody({ type, report, from, to }) {
   )
 }
 
-// Buyers and sellers in one list, sorted by name. A role that doesn't exist
-// makes useUserOptions return everyone, so keep only these two roles.
-function useReportPeople() {
+// People with the given roles in one list, sorted by name. A role that doesn't
+// exist makes useUserOptions return everyone, so keep only these roles.
+function useReportPeople(roles) {
   const buyers = useUserOptions('buyer')
   const sellers = useUserOptions('seller')
   const data = useMemo(() => {
     const byId = new Map()
     for (const person of [...(buyers.data ?? []), ...(sellers.data ?? [])]) {
-      if (REPORT_TYPES[person.role?.slug]) byId.set(person.id, person)
+      if (roles.includes(person.role?.slug)) byId.set(person.id, person)
     }
     return [...byId.values()].sort((a, b) =>
       (a.name ?? '').localeCompare(b.name ?? ''),
     )
-  }, [buyers.data, sellers.data])
-  return { data, isPending: buyers.isPending || sellers.isPending }
+  }, [buyers.data, sellers.data, roles])
+  // Only wait for the lists this page shows.
+  const isPending =
+    (roles.includes('buyer') && buyers.isPending) ||
+    (roles.includes('seller') && sellers.isPending)
+  return { data, isPending }
 }
 
-function ReportsPage() {
+function ReportsPage({ variant = 'users' }) {
+  const page = PAGES[variant]
   // The last report asked for lives in the URL, so a refresh or a shared link keeps it.
   const [params, setParams] = useSearchParams()
   const defaults = currentFinancialYear()
   const applied = {
-    type: params.get('type') === 'seller' ? 'seller' : 'buyer',
+    type: page.roles.includes(params.get('type'))
+      ? params.get('type')
+      : page.roles[0],
     id: params.get('id') ?? '',
     from: params.get('from') || defaults.from,
     to: params.get('to') || defaults.to,
@@ -257,7 +301,10 @@ function ReportsPage() {
   const { id: personId, from, to } = draft
   const change = (changes) => setDraft((d) => ({ ...d, ...changes }))
 
-  const people = useReportPeople()
+  const people = useReportPeople(page.roles)
+  // TDS % comes from the main company; only the TDS page needs it.
+  const company = useCompany(MAIN_COMPANY_ID, { enabled: Boolean(page.tds) })
+  const tdsPercent = company.data?.tds_percentage ?? null
   const person =
     people.data.find((option) => String(option.id) === personId) ?? null
 
@@ -303,10 +350,10 @@ function ReportsPage() {
               Insights
             </Typography>
             <Typography variant="h4" component="h1">
-              Reports
+              {page.title}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-              Pick a buyer or seller to see everyone they traded with.
+              {page.intro}
             </Typography>
           </Box>
           <Button
@@ -334,7 +381,7 @@ function ReportsPage() {
             <Box sx={{ flex: 1, minWidth: 220 }}>
               <OptionPicker
                 id="report-person"
-                label="Buyer or seller"
+                label={page.pickerLabel}
                 options={people.data}
                 loading={people.isPending}
                 value={person}
@@ -385,7 +432,7 @@ function ReportsPage() {
           <Paper elevation={3} sx={{ borderRadius: '12px' }}>
             <TableEmptyState
               icon={<AssessmentOutlined />}
-              title="Pick a buyer or seller"
+              title={`Pick a ${page.pickerLabel.toLowerCase()}`}
               message="Choose a person and dates above, then click View report."
             />
           </Paper>
@@ -395,6 +442,19 @@ function ReportsPage() {
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
             <CircularProgress />
           </Box>
+        )}
+
+        {page.tds && company.isSuccess && tdsPercent == null && (
+          <Alert severity="warning" className="no-print">
+            The TDS % is not set for the main company. Add it on the Companies
+            page to see TDS amounts.
+          </Alert>
+        )}
+
+        {page.tds && company.isError && (
+          <Alert severity="error" className="no-print">
+            Could not load the TDS %: {company.error.message}
+          </Alert>
         )}
 
         {report.isError && (
@@ -419,6 +479,9 @@ function ReportsPage() {
             <Box>
               <ReportBody
                 type={applied.type}
+                title={page.reportTitle(applied.type)}
+                tds={page.tds}
+                tdsPercent={tdsPercent}
                 report={report.data}
                 from={report.data.from}
                 to={report.data.to}

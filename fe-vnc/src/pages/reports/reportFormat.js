@@ -26,6 +26,10 @@ export const formatWeight = (value) => weightFormat.format(value)
 export const partyMeta = (party) =>
   party?.gst_number ? `GSTIN ${party.gst_number}` : ''
 
+// TDS on an amount, rounded to paise; null when no TDS % is set.
+export const tdsAmount = (amount, percent) =>
+  percent == null ? null : Math.round(amount * percent) / 100
+
 // Numbers line up in columns and never wrap.
 export const numericCell = {
   fontVariantNumeric: 'tabular-nums',

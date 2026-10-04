@@ -4,8 +4,11 @@ import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import BusinessOutlined from '@mui/icons-material/BusinessOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import AssessmentOutlined from '@mui/icons-material/AssessmentOutlined'
+import PersonSearchOutlined from '@mui/icons-material/PersonSearchOutlined'
+import RequestQuoteOutlined from '@mui/icons-material/RequestQuoteOutlined'
 
 // Everyday pages: shown as links in the top bar.
+// An item with `children` opens a small menu instead of being a link.
 export const NAV_ITEMS = [
   {
     to: '/dashboard',
@@ -21,6 +24,18 @@ export const NAV_ITEMS = [
     to: '/reports',
     label: 'Reports',
     icon: AssessmentOutlined,
+    children: [
+      {
+        to: '/reports/users',
+        label: 'User Reports',
+        icon: PersonSearchOutlined,
+      },
+      {
+        to: '/reports/tds',
+        label: 'TDS Report',
+        icon: RequestQuoteOutlined,
+      },
+    ],
   },
 ]
 

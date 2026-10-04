@@ -45,6 +45,7 @@ model Company {
   pan_number                  String?
   seller_commision_percentage Float?
   buyer_commision_percentage  Float?
+  tds_percentage              Float?
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime @updatedAt
 

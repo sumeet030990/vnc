@@ -23,6 +23,7 @@ const companies = [
     state: 'Maharashtra',
     seller_commision_percentage: 1,
     buyer_commision_percentage: 1,
+    tds_percentage: 0.1,
   },
 ]
 

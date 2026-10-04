@@ -84,6 +84,7 @@ const schema = yup.object({
     }),
   seller_commision_percentage: percentage('Seller commission'),
   buyer_commision_percentage: percentage('Buyer commission'),
+  tds_percentage: percentage('TDS'),
 })
 
 const TEXT_FIELDS = [
@@ -102,6 +103,7 @@ const TEXT_FIELDS = [
 const PERCENT_FIELDS = [
   'seller_commision_percentage',
   'buyer_commision_percentage',
+  'tds_percentage',
 ]
 
 const toFormValues = (company) =>
@@ -333,9 +335,9 @@ function CompanyFormDialog({ open, company, onClose, onSaved }) {
         </Box>
 
         <Box sx={{ mt: 3.5 }}>
-          <SectionLabel>Commission</SectionLabel>
+          <SectionLabel>Commission &amp; TDS</SectionLabel>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 {...fieldProps('seller_commision_percentage')}
                 label="Seller commission"
@@ -343,10 +345,18 @@ function CompanyFormDialog({ open, company, onClose, onSaved }) {
                 slotProps={percentSlotProps}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 {...fieldProps('buyer_commision_percentage')}
                 label="Buyer commission"
+                type="number"
+                slotProps={percentSlotProps}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                {...fieldProps('tds_percentage')}
+                label="TDS"
                 type="number"
                 slotProps={percentSlotProps}
               />

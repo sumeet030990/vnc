@@ -17,6 +17,7 @@ const companySelect = {
   pan_number: true,
   seller_commision_percentage: true,
   buyer_commision_percentage: true,
+  tds_percentage: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.CompanySelect

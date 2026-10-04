@@ -16,11 +16,36 @@ import {
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown'
 import Logout from '@mui/icons-material/Logout'
 import { useAuth } from '../auth/useAuth.js'
 import { MASTER_DATA_ITEMS, NAV_ITEMS } from './navItems.js'
 
 const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'App'
+
+// Top bar link look; `.active` adds the gold underline for the current page.
+const navButtonSx = (t) => ({
+  position: 'relative',
+  flexShrink: 0,
+  px: 1.75,
+  color: alpha(t.palette.common.white, 0.7),
+  fontWeight: 500,
+  '&:hover': {
+    color: 'common.white',
+    bgcolor: alpha(t.palette.common.white, 0.06),
+  },
+  '&.active': { color: 'common.white' },
+  '&.active::after': {
+    content: '""',
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 2,
+    height: 2,
+    borderRadius: 2,
+    bgcolor: 'secondary.main',
+  },
+})
 
 const initials = (name = '') =>
   name
@@ -35,6 +60,8 @@ function AppLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [userAnchor, setUserAnchor] = useState(null)
+  // Open top bar dropdown: { anchor, items } or null.
+  const [navMenu, setNavMenu] = useState(null)
 
   const handleLogout = () => {
     setUserAnchor(null)
@@ -83,39 +110,48 @@ function AppLayout() {
               scrollbarWidth: 'none',
             }}
           >
-            {NAV_ITEMS.map(({ to, label }) => (
-              <Button
+            {NAV_ITEMS.map(({ to, label, children }) =>
+              children ? (
+                <Button
+                  key={to}
+                  className={pathname.startsWith(to) ? 'active' : undefined}
+                  endIcon={<KeyboardArrowDown />}
+                  onClick={(e) =>
+                    setNavMenu({ anchor: e.currentTarget, items: children })
+                  }
+                  aria-haspopup="menu"
+                  sx={navButtonSx}
+                >
+                  {label}
+                </Button>
+              ) : (
+                <Button key={to} component={NavLink} to={to} sx={navButtonSx}>
+                  {label}
+                </Button>
+              ),
+            )}
+          </Box>
+
+          <Menu
+            anchorEl={navMenu?.anchor}
+            open={Boolean(navMenu)}
+            onClose={() => setNavMenu(null)}
+          >
+            {navMenu?.items.map(({ to, label, icon: Icon }) => (
+              <MenuItem
                 key={to}
                 component={NavLink}
                 to={to}
-                sx={(t) => ({
-                  position: 'relative',
-                  flexShrink: 0,
-                  px: 1.75,
-                  color: alpha(t.palette.common.white, 0.7),
-                  fontWeight: 500,
-                  '&:hover': {
-                    color: 'common.white',
-                    bgcolor: alpha(t.palette.common.white, 0.06),
-                  },
-                  // Gold underline marks the current page.
-                  '&.active': { color: 'common.white' },
-                  '&.active::after': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 14,
-                    right: 14,
-                    bottom: 2,
-                    height: 2,
-                    borderRadius: 2,
-                    bgcolor: 'secondary.main',
-                  },
-                })}
+                selected={pathname.startsWith(to)}
+                onClick={() => setNavMenu(null)}
               >
-                {label}
-              </Button>
+                <ListItemIcon>
+                  <Icon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{label}</ListItemText>
+              </MenuItem>
             ))}
-          </Box>
+          </Menu>
 
           <Box sx={{ flexShrink: 0 }}>
             <Button

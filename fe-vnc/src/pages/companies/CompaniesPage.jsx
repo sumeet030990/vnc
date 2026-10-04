@@ -143,6 +143,14 @@ function CompaniesPage() {
           />
         ),
       },
+      {
+        accessorKey: 'tds_percentage',
+        header: 'TDS',
+        size: 100,
+        Cell: ({ cell }) => (
+          <MutedCell value={formatPercent(cell.getValue())} />
+        ),
+      },
     ],
     [],
   )

@@ -12,15 +12,20 @@ import {
   formatMoney,
   formatWeight,
   numericCell,
+  tdsAmount,
 } from './reportFormat.js'
 
-const COLUMNS = [
+const LEAD_COLUMNS = [
   { label: 'Date' },
   { label: 'Bill' },
   { label: 'Buyer' },
   { label: 'City' },
   { label: 'Invoice no.' },
   { label: 'Item' },
+]
+
+const SELLER_COLUMNS = [
+  ...LEAD_COLUMNS,
   { label: 'Bags', numeric: true },
   { label: 'Packing', numeric: true },
   { label: 'Quintal', numeric: true },
@@ -29,10 +34,20 @@ const COLUMNS = [
   { label: 'Commission', numeric: true },
 ]
 
+const tdsColumns = () => [
+  ...LEAD_COLUMNS,
+  { label: 'Amount', numeric: true },
+  {
+    label: 'TDS Amount',
+    numeric: true,
+  },
+]
+
 // One row per item the seller sold, with the buyer it went to.
-function SellerReportTable({ items, totals }) {
+// With `tds` set, only money is shown: the amount and the TDS on it.
+function SellerReportTable({ items, totals, tds = false, tdsPercent }) {
   return (
-    <ReportTable columns={COLUMNS}>
+    <ReportTable columns={tds ? tdsColumns(tdsPercent) : SELLER_COLUMNS}>
       {items.map((item, index) => (
         <TableRow
           key={item.id}
@@ -47,23 +62,31 @@ function SellerReportTable({ items, totals }) {
           <TableCell>{item.bill.buyer?.city || '—'}</TableCell>
           <TableCell>{item.seller_bill_no || '—'}</TableCell>
           <TableCell>{item.item?.name || '—'}</TableCell>
-          <TableCell align="right" sx={numericCell}>
-            {formatCount(item.quantity_bags)}
-          </TableCell>
-          <TableCell align="right" sx={numericCell}>
-            {formatCount(item.packaging)}
-          </TableCell>
-          <TableCell align="right" sx={numericCell}>
-            {formatWeight(item.weight)}
-          </TableCell>
-          <TableCell align="right" sx={numericCell}>
-            {formatMoney(item.souda_rate)}
-          </TableCell>
+          {!tds && (
+            <>
+              <TableCell align="right" sx={numericCell}>
+                {formatCount(item.quantity_bags)}
+              </TableCell>
+              <TableCell align="right" sx={numericCell}>
+                {formatCount(item.packaging)}
+              </TableCell>
+              <TableCell align="right" sx={numericCell}>
+                {formatWeight(item.weight)}
+              </TableCell>
+              <TableCell align="right" sx={numericCell}>
+                {formatMoney(item.souda_rate)}
+              </TableCell>
+            </>
+          )}
           <TableCell align="right" sx={numericCell}>
             {formatMoney(item.amount)}
           </TableCell>
           <TableCell align="right" sx={numericCell}>
-            {formatMoney(item.seller_commision_amount)}
+            {formatMoney(
+              tds
+                ? tdsAmount(item.amount, tdsPercent)
+                : item.seller_commision_amount,
+            )}
           </TableCell>
         </TableRow>
       ))}
@@ -71,19 +94,25 @@ function SellerReportTable({ items, totals }) {
         <TableCell data-first colSpan={6} align="right">
           Total
         </TableCell>
-        <TableCell align="right" sx={numericCell}>
-          {formatCount(totals.quantity_bags)}
-        </TableCell>
-        <TableCell />
-        <TableCell align="right" sx={numericCell}>
-          {formatWeight(totals.weight)}
-        </TableCell>
-        <TableCell />
+        {!tds && (
+          <>
+            <TableCell align="right" sx={numericCell}>
+              {formatCount(totals.quantity_bags)}
+            </TableCell>
+            <TableCell />
+            <TableCell align="right" sx={numericCell}>
+              {formatWeight(totals.weight)}
+            </TableCell>
+            <TableCell />
+          </>
+        )}
         <TableCell align="right" sx={numericCell}>
           {formatMoney(totals.amount)}
         </TableCell>
         <TableCell align="right" sx={numericCell}>
-          {formatMoney(totals.seller_commision_amount)}
+          {formatMoney(
+            tds ? totals.tds_amount : totals.seller_commision_amount,
+          )}
         </TableCell>
       </TotalsRow>
     </ReportTable>

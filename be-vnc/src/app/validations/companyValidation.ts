@@ -84,6 +84,7 @@ export const replaceCompanySchema = z.object({
   pan_number: panNumber,
   seller_commision_percentage: percentage('Seller commission percentage'),
   buyer_commision_percentage: percentage('Buyer commission percentage'),
+  tds_percentage: percentage('TDS percentage'),
 })
 
 // Only the name is needed to create; the rest can be filled in later.

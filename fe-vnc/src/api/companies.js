@@ -17,10 +17,11 @@ export function useCompanies() {
   })
 }
 
-export function useCompany(id) {
+export function useCompany(id, options) {
   return useQuery({
     queryKey: companyKeys.detail(id),
     queryFn: ({ signal }) => apiFetch(`/api/companies/${id}`, { signal }),
+    ...options,
   })
 }
 

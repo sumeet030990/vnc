@@ -25,7 +25,19 @@ function App() {
           <Route path="/commission-bills" element={<BillsPage />} />
           <Route path="/commission-bills/new" element={<BillFormPage />} />
           <Route path="/commission-bills/:id/edit" element={<BillFormPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route
+            path="/reports"
+            element={<Navigate to="/reports/users" replace />}
+          />
+          {/* Same page twice; `key` gives each its own fresh state. */}
+          <Route
+            path="/reports/users"
+            element={<ReportsPage key="users" variant="users" />}
+          />
+          <Route
+            path="/reports/tds"
+            element={<ReportsPage key="tds" variant="tds" />}
+          />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/companies" element={<CompaniesPage />} />
