@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Avatar,
   Box,
@@ -23,6 +23,7 @@ import DataTable from '../../components/table/DataTable.jsx'
 import RowActionButton from '../../components/table/RowActionButton.jsx'
 import TableEmptyState from '../../components/table/TableEmptyState.jsx'
 import TableSearchField from '../../components/table/TableSearchField.jsx'
+import { useDebouncedValue } from '../../lib/useDebouncedValue.js'
 import UserFormDialog from './UserFormDialog.jsx'
 import DeleteUserDialog from './DeleteUserDialog.jsx'
 
@@ -35,16 +36,6 @@ const initials = (name = '') =>
     .slice(0, 2)
     .map((part) => part[0].toUpperCase())
     .join('') || '?'
-
-// Waits until typing stops before the value changes, so we don't call the API per key.
-function useDebouncedValue(value, delay) {
-  const [debounced, setDebounced] = useState(value)
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay)
-    return () => clearTimeout(timer)
-  }, [value, delay])
-  return debounced
-}
 
 function NameCell({ user, isSelf }) {
   return (

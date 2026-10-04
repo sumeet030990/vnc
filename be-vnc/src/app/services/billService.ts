@@ -14,13 +14,65 @@ import {
 } from '../validations/billValidation'
 import { ReportRangeQuery } from '../validations/reportValidation'
 
+// Reads a typed date like 2026-10-04, 04-10-2026 or 4/10/2026 (day first).
+// Returns null when the text isn't a real date.
+function parseSearchDate(text: string) {
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text)
+  const dayFirst = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/.exec(text)
+  let parts: number[]
+  if (iso) parts = [iso[1], iso[2], iso[3]].map(Number)
+  else if (dayFirst) parts = [dayFirst[3], dayFirst[2], dayFirst[1]].map(Number)
+  else return null
+
+  const [year, month, day] = parts as [number, number, number]
+  const date = new Date(Date.UTC(year, month - 1, day))
+  // Rejects dates like 31-02-2026, which Date would roll into March.
+  return date.getUTCDate() === day && date.getUTCMonth() === month - 1
+    ? date
+    : null
+}
+
+// One search box looks at party names, the bill id, seller bill numbers and the bill date.
+function billSearchFilter(search: string): Prisma.BillsWhereInput {
+  const name = { name: { contains: search } }
+  const or: Prisma.BillsWhereInput[] = [
+    { buyer: name },
+    { transporter: name },
+    {
+      bill_items: {
+        some: {
+          OR: [{ seller: name }, { seller_bill_no: { contains: search } }],
+        },
+      },
+    },
+  ]
+
+  const billId = Number(search.replace(/^#/, ''))
+  if (Number.isSafeInteger(billId) && billId > 0) or.push({ id: billId })
+
+  const date = parseSearchDate(search)
+  if (date) or.push({ bill_date: date })
+
+  return { OR: or }
+}
+
 export async function listBills({
   page,
   pageSize,
-  buyerId,
-  transporter_id,
+  userId,
+  search,
+  from,
+  to,
 }: ListBillsQuery) {
-  const where: Prisma.BillsWhereInput = { buyerId, transporter_id }
+  const filters: Prisma.BillsWhereInput[] = []
+  if (userId) {
+    filters.push({
+      OR: [{ buyerId: userId }, { bill_items: { some: { sellerId: userId } } }],
+    })
+  }
+  if (search) filters.push(billSearchFilter(search))
+  if (from || to) filters.push({ bill_date: { gte: from, lte: to } })
+  const where: Prisma.BillsWhereInput = { AND: filters }
 
   const [bills, total] = await Promise.all([
     billRepository.findBills(where, (page - 1) * pageSize, pageSize),

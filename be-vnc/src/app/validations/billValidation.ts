@@ -58,21 +58,38 @@ export const billIdParamsSchema = z.object({
   id: queryId('Bill id'),
 })
 
-export const listBillsQuerySchema = z.object({
-  page: z.coerce
-    .number({ error: 'Page must be a number' })
-    .int({ error: 'Page must be a whole number' })
-    .min(1, { error: 'Page must be 1 or more' })
-    .default(1),
-  pageSize: z.coerce
-    .number({ error: 'Page size must be a number' })
-    .int({ error: 'Page size must be a whole number' })
-    .min(1, { error: 'Page size must be 1 or more' })
-    .max(100, { error: 'Page size must be 100 or less' })
-    .default(20),
-  buyerId: queryId('Buyer').optional(),
-  transporter_id: queryId('Transporter').optional(),
-})
+const rangeDate = (label: string) =>
+  z.iso
+    .date({ error: `${label} must be a date like 2026-10-04` })
+    .transform((value) => new Date(value))
+
+export const listBillsQuerySchema = z
+  .object({
+    page: z.coerce
+      .number({ error: 'Page must be a number' })
+      .int({ error: 'Page must be a whole number' })
+      .min(1, { error: 'Page must be 1 or more' })
+      .default(1),
+    pageSize: z.coerce
+      .number({ error: 'Page size must be a number' })
+      .int({ error: 'Page size must be a whole number' })
+      .min(1, { error: 'Page size must be 1 or more' })
+      .max(100, { error: 'Page size must be 100 or less' })
+      .default(20),
+    // Bills where this user is the buyer or one of the sellers.
+    userId: queryId('User').optional(),
+    // Matches party names, bill id, seller bill number or bill date.
+    search: z
+      .string({ error: 'Search must be text' })
+      .trim()
+      .max(MAX_TEXT, { error: `Search must be at most ${MAX_TEXT} characters` })
+      .optional(),
+    from: rangeDate('From date').optional(),
+    to: rangeDate('To date').optional(),
+  })
+  .refine(({ from, to }) => !from || !to || from <= to, {
+    error: 'From date must be on or before the to date',
+  })
 
 export const createBillSchema = z.object({
   buyerId: id('Buyer'),

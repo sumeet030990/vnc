@@ -13,7 +13,7 @@ export const billKeys = {
   detail: (id) => ['bills', 'detail', id],
 }
 
-// params: { page, pageSize, buyerId, transporter_id } — empty values are left out.
+// params: { page, pageSize, userId, search, from, to } — empty values are left out.
 export function useBills(params) {
   const query = new URLSearchParams(
     Object.entries(params).filter(([, value]) => value !== '' && value != null),

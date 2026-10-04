@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Fade,
-  MenuItem,
   Snackbar,
   Stack,
   TextField,
@@ -16,11 +15,14 @@ import EditOutlined from '@mui/icons-material/EditOutlined'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import { useBills } from '../../api/bills.js'
-import { useUserOptions } from '../../api/users.js'
+import { usePeopleOptions } from '../../api/users.js'
 import DataTable from '../../components/table/DataTable.jsx'
 import RowActionButton from '../../components/table/RowActionButton.jsx'
 import TableEmptyState from '../../components/table/TableEmptyState.jsx'
+import TableSearchField from '../../components/table/TableSearchField.jsx'
+import { useDebouncedValue } from '../../lib/useDebouncedValue.js'
 import DeleteBillDialog from './DeleteBillDialog.jsx'
+import OptionPicker from './OptionPicker.jsx'
 import { formatMoney } from './billForm.js'
 
 const NEW_BILL_PATH = '/commission-bills/new'
@@ -30,40 +32,37 @@ const dateFormat = new Intl.DateTimeFormat('en-IN', {
   timeZone: 'UTC',
 })
 
-// Small "All ..." dropdown for the table toolbar.
-function PersonFilter({ label, query, value, onChange }) {
+const SEARCH_DELAY_MS = 300
+// The user filter shows buyers and sellers together.
+const PARTY_ROLES = ['buyer', 'seller']
+
+// Small "From" or "To" date box for the table toolbar.
+function DateFilter({ label, value, onChange, error }) {
   return (
     <TextField
-      select
+      label={label}
+      type="date"
       size="small"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      disabled={query.isPending || query.isError}
-      sx={{ minWidth: 180 }}
-      slotProps={{
-        select: { displayEmpty: true },
-        htmlInput: { 'aria-label': `Filter by ${label.toLowerCase()}` },
-      }}
-    >
-      <MenuItem value="">All {label.toLowerCase()}s</MenuItem>
-      {query.data?.map((person) => (
-        <MenuItem key={person.id} value={person.id}>
-          {person.name || `#${person.id}`}
-        </MenuItem>
-      ))}
-    </TextField>
+      error={error}
+      sx={{ width: { sm: 160 } }}
+      slotProps={{ inputLabel: { shrink: true } }}
+    />
   )
 }
 
 function BillsPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const buyers = useUserOptions('buyer')
-  const transporters = useUserOptions('transporter')
+  const people = usePeopleOptions(PARTY_ROLES)
 
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 })
-  const [buyerId, setBuyerId] = useState('')
-  const [transporterId, setTransporterId] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const search = useDebouncedValue(searchInput.trim(), SEARCH_DELAY_MS)
+  const [person, setPerson] = useState(null)
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
   const [deleteDialog, setDeleteDialog] = useState({
     open: false,
     bill: null,
@@ -77,30 +76,38 @@ function BillsPage() {
     if (location.state?.notice) navigate('.', { replace: true, state: null })
   }, [location.state, navigate])
 
+  // ISO dates compare correctly as text. A wrong range isn't sent to the API.
+  const isRangeWrong = Boolean(from && to && from > to)
+  const filters = {
+    userId: person?.id ?? '',
+    search,
+    from: isRangeWrong ? '' : from,
+    to: isRangeWrong ? '' : to,
+  }
+
   const bills = useBills({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
-    buyerId,
-    transporter_id: transporterId,
+    ...filters,
   })
 
   const data = useMemo(() => bills.data?.bills ?? [], [bills.data])
   const total = bills.data?.total ?? 0
-  const isFiltered = Boolean(buyerId || transporterId)
+  const isFiltered = Object.values(filters).some(Boolean)
 
-  // A new filter should start from the first page.
-  const [lastFilters, setLastFilters] = useState({ buyerId, transporterId })
-  if (
-    lastFilters.buyerId !== buyerId ||
-    lastFilters.transporterId !== transporterId
-  ) {
-    setLastFilters({ buyerId, transporterId })
+  // A new search or filter should start from the first page.
+  const filterKey = JSON.stringify(filters)
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey)
+  if (lastFilterKey !== filterKey) {
+    setLastFilterKey(filterKey)
     setPagination((p) => ({ ...p, pageIndex: 0 }))
   }
 
   const clearFilters = () => {
-    setBuyerId('')
-    setTransporterId('')
+    setSearchInput('')
+    setPerson(null)
+    setFrom('')
+    setTo('')
   }
 
   const openDelete = (bill) =>
@@ -216,17 +223,33 @@ function BillsPage() {
           actionsSize={136}
           filters={
             <>
-              <PersonFilter
-                label="Buyer"
-                query={buyers}
-                value={buyerId}
-                onChange={setBuyerId}
+              <TableSearchField
+                value={searchInput}
+                onChange={setSearchInput}
+                placeholder="Search name, bill no., seller bill no. or date"
               />
-              <PersonFilter
-                label="Transporter"
-                query={transporters}
-                value={transporterId}
-                onChange={setTransporterId}
+              <Box sx={{ width: { sm: 220 } }}>
+                <OptionPicker
+                  label="Buyer or seller"
+                  size="small"
+                  options={people.data}
+                  loading={people.isPending}
+                  value={person}
+                  onChange={setPerson}
+                  getOptionNote={(option) => option.role?.name}
+                />
+              </Box>
+              <DateFilter
+                label="From"
+                value={from}
+                onChange={setFrom}
+                error={isRangeWrong}
+              />
+              <DateFilter
+                label="To"
+                value={to}
+                onChange={setTo}
+                error={isRangeWrong}
               />
             </>
           }
@@ -268,7 +291,7 @@ function BillsPage() {
               title={isFiltered ? 'No bills found' : 'No bills yet'}
               message={
                 isFiltered
-                  ? 'Try a different buyer or transporter.'
+                  ? 'Try a different search, person or date range.'
                   : 'Create your first commission bill to get started.'
               }
               action={

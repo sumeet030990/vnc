@@ -57,7 +57,7 @@ export function findUsers(
     skip,
     take,
     select: userSelect,
-    orderBy: { id: 'asc' },
+    orderBy: { id: 'desc' },
   })
 }
 

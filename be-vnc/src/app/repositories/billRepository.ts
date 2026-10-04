@@ -81,7 +81,7 @@ export function findBills(
     skip,
     take,
     select: billListSelect,
-    orderBy: [{ bill_date: 'desc' }, { id: 'desc' }],
+    orderBy: { id: 'desc' },
   })
 }
 

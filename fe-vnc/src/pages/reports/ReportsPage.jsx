@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import {
   Alert,
@@ -16,7 +16,7 @@ import AssessmentOutlined from '@mui/icons-material/AssessmentOutlined'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import { MAIN_COMPANY_ID, useCompany } from '../../api/companies.js'
 import { useReport } from '../../api/reports.js'
-import { useUserOptions } from '../../api/users.js'
+import { usePeopleOptions } from '../../api/users.js'
 import TableEmptyState from '../../components/table/TableEmptyState.jsx'
 import OptionPicker from '../bills/OptionPicker.jsx'
 import BuyerReportTable from './BuyerReportTable.jsx'
@@ -261,27 +261,6 @@ function ReportBody({ type, title, tds, tdsPercent, report, from, to }) {
   )
 }
 
-// People with the given roles in one list, sorted by name. A role that doesn't
-// exist makes useUserOptions return everyone, so keep only these roles.
-function useReportPeople(roles) {
-  const buyers = useUserOptions('buyer')
-  const sellers = useUserOptions('seller')
-  const data = useMemo(() => {
-    const byId = new Map()
-    for (const person of [...(buyers.data ?? []), ...(sellers.data ?? [])]) {
-      if (roles.includes(person.role?.slug)) byId.set(person.id, person)
-    }
-    return [...byId.values()].sort((a, b) =>
-      (a.name ?? '').localeCompare(b.name ?? ''),
-    )
-  }, [buyers.data, sellers.data, roles])
-  // Only wait for the lists this page shows.
-  const isPending =
-    (roles.includes('buyer') && buyers.isPending) ||
-    (roles.includes('seller') && sellers.isPending)
-  return { data, isPending }
-}
-
 function ReportsPage({ variant = 'users' }) {
   const page = PAGES[variant]
   // The last report asked for lives in the URL, so a refresh or a shared link keeps it.
@@ -301,7 +280,7 @@ function ReportsPage({ variant = 'users' }) {
   const { id: personId, from, to } = draft
   const change = (changes) => setDraft((d) => ({ ...d, ...changes }))
 
-  const people = useReportPeople(page.roles)
+  const people = usePeopleOptions(page.roles)
   // TDS % comes from the main company; only the TDS page needs it.
   const company = useCompany(MAIN_COMPANY_ID, { enabled: Boolean(page.tds) })
   const tdsPercent = company.data?.tds_percentage ?? null
