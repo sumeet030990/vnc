@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from './client.js'
+import { billKeys } from './bills.js'
+import { reportKeys } from './reports.js'
 import { statsKeys } from './stats.js'
 
 export const itemKeys = {
@@ -14,7 +16,8 @@ export function useItems() {
   })
 }
 
-// Any change to items makes the list and the dashboard totals out of date.
+// Any change to items makes the list, the dashboard totals,
+// and the bills and reports (which show item names) out of date.
 function useItemMutation(mutationFn) {
   const queryClient = useQueryClient()
   return useMutation({
@@ -22,6 +25,8 @@ function useItemMutation(mutationFn) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.all })
       queryClient.invalidateQueries({ queryKey: statsKeys.summary })
+      queryClient.invalidateQueries({ queryKey: billKeys.all })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
     },
   })
 }

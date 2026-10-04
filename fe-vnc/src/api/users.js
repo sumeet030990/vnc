@@ -5,6 +5,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { apiFetch } from './client.js'
+import { authKeys } from './auth.js'
+import { billKeys } from './bills.js'
+import { reportKeys } from './reports.js'
 import { useRoles } from './roles.js'
 import { statsKeys } from './stats.js'
 
@@ -45,7 +48,8 @@ export function useUserOptions(roleSlug) {
   })
 }
 
-// Any change to users makes the list and the dashboard totals out of date.
+// Any change to users makes the list, the dashboard totals, the login list,
+// and the bills and reports (which show buyer, seller and transporter details) out of date.
 function useUserMutation(mutationFn) {
   const queryClient = useQueryClient()
   return useMutation({
@@ -53,6 +57,9 @@ function useUserMutation(mutationFn) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all })
       queryClient.invalidateQueries({ queryKey: statsKeys.summary })
+      queryClient.invalidateQueries({ queryKey: authKeys.users })
+      queryClient.invalidateQueries({ queryKey: billKeys.all })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
     },
   })
 }
