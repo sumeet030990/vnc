@@ -3,13 +3,13 @@ import RequireAuth from './auth/RequireAuth.jsx'
 import AppLayout from './layouts/AppLayout.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
-import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import UsersPage from './pages/users/UsersPage.jsx'
 import ItemsPage from './pages/items/ItemsPage.jsx'
 import CompaniesPage from './pages/companies/CompaniesPage.jsx'
 import BillsPage from './pages/bills/BillsPage.jsx'
 import BillFormPage from './pages/bills/BillFormPage.jsx'
 import BillPrintPage from './pages/bills/BillPrintPage.jsx'
+import ReportsPage from './pages/reports/ReportsPage.jsx'
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
           <Route path="/commission-bills" element={<BillsPage />} />
           <Route path="/commission-bills/new" element={<BillFormPage />} />
           <Route path="/commission-bills/:id/edit" element={<BillFormPage />} />
-          <Route path="/reports" element={<ComingSoonPage title="Reports" />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/companies" element={<CompaniesPage />} />

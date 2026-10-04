@@ -1,10 +1,11 @@
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, TextField, Typography } from '@mui/material'
 
 const optionLabel = (option) => option?.name || `#${option?.id}`
 
 // Searchable dropdown built for the keyboard: type a few letters and the
 // first match is highlighted, then Tab picks it and moves to the next field.
 // `options` and `value` are { id, name } objects.
+// `getOptionNote` (optional) adds small grey text on the right of each option.
 function OptionPicker({
   id,
   label,
@@ -19,6 +20,7 @@ function OptionPicker({
   autoFocus = false,
   dense = false,
   inputRef,
+  getOptionNote,
 }) {
   return (
     <Autocomplete
@@ -43,6 +45,16 @@ function OptionPicker({
         return (
           <li key={option.id} {...liProps}>
             {optionLabel(option)}
+            {getOptionNote && (
+              <Typography
+                component="span"
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 'auto', pl: 2 }}
+              >
+                {getOptionNote(option)}
+              </Typography>
+            )}
           </li>
         )
       }}

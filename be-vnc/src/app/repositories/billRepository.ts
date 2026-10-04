@@ -26,8 +26,8 @@ const billListSelect = {
   _count: { select: { bill_items: true } },
 } satisfies Prisma.BillsSelect
 
-// The detail view (and printed bill) also needs the buyer's contact details.
-const buyerDetailSelect = {
+// Contact and tax details of a buyer or seller, for the printed bill and reports.
+const partyDetailSelect = {
   select: {
     id: true,
     name: true,
@@ -44,7 +44,7 @@ const buyerDetailSelect = {
 // The detail view also sends back every item on the bill.
 const billSelect = {
   ...billFields,
-  buyer: buyerDetailSelect,
+  buyer: partyDetailSelect,
   bill_items: {
     select: {
       id: true,
@@ -109,4 +109,40 @@ export function updateBill(
 
 export function deleteBill(id: number, db: DbClient = prisma) {
   return db.bills.delete({ where: { id }, select: { id: true } })
+}
+
+// Every bill of one buyer in the date range, with its commission and the sellers on it.
+export function findBuyerReportBills(
+  buyerId: number,
+  from: Date,
+  to: Date,
+  db: DbClient = prisma,
+) {
+  return db.bills.findMany({
+    where: { buyerId, bill_date: { gte: from, lte: to } },
+    select: {
+      id: true,
+      bill_date: true,
+      total_amount: true,
+      buyer_commision_amount: true,
+      lorry_number: true,
+      lorry_driver_contact: true,
+      transporter: personSelect,
+      bill_items: {
+        select: {
+          id: true,
+          seller_bill_no: true,
+          quantity_bags: true,
+          packaging: true,
+          weight: true,
+          souda_rate: true,
+          amount: true,
+          seller: partyDetailSelect,
+          item: { select: { id: true, name: true } },
+        },
+        orderBy: { id: 'asc' },
+      },
+    },
+    orderBy: [{ bill_date: 'asc' }, { id: 'asc' }],
+  })
 }

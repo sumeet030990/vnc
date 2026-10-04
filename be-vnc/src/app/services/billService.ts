@@ -1,4 +1,6 @@
 import { Prisma } from '../../generated/prisma/client'
+import { toDateOnly } from '../../lib/financialYear'
+import { round2 } from '../../lib/round'
 import { HttpError } from '../../lib/httpError'
 import prisma, { DbClient } from '../../lib/prisma'
 import * as billItemsRepository from '../repositories/billItemsRepository'
@@ -10,6 +12,7 @@ import {
   ReplaceBillInput,
   UpdateBillInput,
 } from '../validations/billValidation'
+import { ReportRangeQuery } from '../validations/reportValidation'
 
 export async function listBills({
   page,
@@ -88,4 +91,46 @@ export function updateBill(
 export async function deleteBill(id: number) {
   await ensureBillExists(id)
   await billRepository.deleteBill(id)
+}
+
+// Every bill of one buyer in the date range, each with its sellers, plus grand totals.
+export async function getBuyerReport(
+  buyerId: number,
+  { from, to }: ReportRangeQuery,
+) {
+  const bills = await billRepository.findBuyerReportBills(buyerId, from, to)
+
+  const totals = {
+    bills: bills.length,
+    quantity_bags: 0,
+    weight: 0,
+    amount: 0,
+    total_amount: 0,
+    buyer_commision_amount: 0,
+  }
+  for (const bill of bills) {
+    totals.total_amount += bill.total_amount
+    totals.buyer_commision_amount += bill.buyer_commision_amount
+    for (const item of bill.bill_items) {
+      totals.quantity_bags += item.quantity_bags
+      totals.weight += item.weight
+      totals.amount += item.amount
+    }
+  }
+
+  return {
+    from: toDateOnly(from),
+    to: toDateOnly(to),
+    bills: bills.map((bill) => ({
+      ...bill,
+      bill_date: toDateOnly(bill.bill_date),
+    })),
+    totals: {
+      ...totals,
+      weight: round2(totals.weight),
+      amount: round2(totals.amount),
+      total_amount: round2(totals.total_amount),
+      buyer_commision_amount: round2(totals.buyer_commision_amount),
+    },
+  }
 }

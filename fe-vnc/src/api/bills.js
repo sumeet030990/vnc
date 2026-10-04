@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { apiFetch } from './client.js'
+import { reportKeys } from './reports.js'
 
 export const billKeys = {
   all: ['bills'],
@@ -34,12 +35,15 @@ export function useBill(id) {
   })
 }
 
-// Any change to a bill makes the lists and that bill's details out of date.
+// Any change to a bill makes the lists, that bill's details and the reports out of date.
 function useBillMutation(mutationFn) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: billKeys.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: billKeys.all })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+    },
   })
 }
 

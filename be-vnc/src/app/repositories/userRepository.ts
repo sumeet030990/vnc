@@ -92,3 +92,22 @@ export function updateUser(
 export function deleteUser(id: number, db: DbClient = prisma) {
   return db.users.delete({ where: { id }, select: { id: true } })
 }
+
+// Contact and tax details shown at the top of a buyer or seller report.
+export function findReportUserById(id: number, db: DbClient = prisma) {
+  return db.users.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      primary_mobile_no: true,
+      address: true,
+      city: true,
+      state: true,
+      pin_code: true,
+      gst_number: true,
+      pan_number: true,
+      role: { select: { name: true, slug: true } },
+    },
+  })
+}

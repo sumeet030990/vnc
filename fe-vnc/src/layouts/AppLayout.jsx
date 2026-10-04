@@ -43,7 +43,14 @@ function AppLayout() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        // Paper is white, so pages printed from inside the app are too.
+        '@media print': { bgcolor: 'background.paper', minHeight: 0 },
+      }}
+    >
       <AppBar position="sticky">
         <Toolbar sx={{ gap: 1, flex: 1, justifyContent: 'space-between' }}>
           {/* Small screens: links move into a menu. */}

@@ -175,3 +175,12 @@ export async function deleteUser(id: number, currentUserId: number) {
 
   await userRepository.deleteUser(id)
 }
+
+// The person a report is about. `label` is used in the 404 message (e.g. 'Buyer').
+export async function getReportUserById(id: number, label: string) {
+  const user = await userRepository.findReportUserById(id)
+  if (!user) {
+    throw new HttpError(404, `${label} not found`)
+  }
+  return user
+}
