@@ -7,6 +7,9 @@ const PASTE_SHORTCUT = /Mac|iPhone|iPad/.test(navigator.userAgent)
   ? '⌘ V'
   : 'Ctrl + V'
 
+// Our Electron desktop app adds this (desktop/preload.js). Missing in a browser.
+const desktop = window.vncDesktop
+
 // True where the share menu takes files (phones, Chrome/Edge on Windows, Safari on Mac).
 function canSharePdf() {
   try {
@@ -63,11 +66,18 @@ export function useShareBill(showNotice) {
     }
   }
 
+  // The desktop app opens the macOS share menu itself, so no click is needed.
+  const shareDesktopPdf = async (file) => {
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    await desktop.sharePdf(file.name, bytes)
+  }
+
   const shareBill = (billId) => {
-    if (canSharePdf()) {
+    if (desktop?.canSharePdf || canSharePdf()) {
+      const share = desktop?.canSharePdf ? shareDesktopPdf : sharePdf
       drawBillCanvas(billId)
         .then((canvas) => canvasToPdf(canvas, `Bill-${billId}.pdf`))
-        .then(sharePdf)
+        .then(share)
         .catch(() => showNotice('Could not share the bill. Please try again.'))
         .finally(() => setJob(null))
       return
@@ -84,7 +94,9 @@ export function useShareBill(showNotice) {
     navigator.clipboard
       .write([new ClipboardItem({ 'image/png': picture })])
       .then(() => {
-        const opened = openWhatsAppWeb()
+        // The desktop app always opens links in the browser, but window.open
+        // there still returns nothing, so don't offer the button again.
+        const opened = openWhatsAppWeb() || Boolean(desktop)
         showNotice(
           `Bill #${billId} copied. In WhatsApp Web, open a chat and press ${PASTE_SHORTCUT}.`,
           opened

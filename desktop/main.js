@@ -1,4 +1,11 @@
-const { app, BrowserWindow, dialog, shell } = require('electron')
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  shell,
+  ShareMenu,
+} = require('electron')
 const fs = require('node:fs')
 const path = require('node:path')
 
@@ -52,9 +59,48 @@ function startBackend(port) {
   })
 }
 
+// Shared PDFs wait here until the next share or until the app closes, because
+// the app the user shares to reads the file after the menu closes.
+const shareDir = path.join(app.getPath('temp'), 'vnc-share')
+
+function clearShareDir() {
+  fs.rmSync(shareDir, { recursive: true, force: true })
+}
+
+// macOS share menu for a PDF made by the web page (see preload.js).
+function handleSharePdf(appUrl) {
+  const appOrigin = new URL(appUrl).origin
+
+  ipcMain.handle('share-pdf', (event, fileName, bytes) => {
+    // Only our own page may ask, and only with a PDF.
+    if (new URL(event.senderFrame.url).origin !== appOrigin) {
+      throw new Error('Not allowed')
+    }
+    if (process.platform !== 'darwin') throw new Error('Not supported')
+    if (!(bytes instanceof Uint8Array)) throw new Error('Not a file')
+
+    // basename stops a name like "../x" from writing outside the folder.
+    const safeName = path.basename(String(fileName)).replace(/[^\w.-]/g, '_')
+    if (!safeName.toLowerCase().endsWith('.pdf')) throw new Error('Not a PDF')
+
+    clearShareDir()
+    fs.mkdirSync(shareDir, { recursive: true })
+    const filePath = path.join(shareDir, safeName)
+    fs.writeFileSync(filePath, bytes)
+
+    const window = BrowserWindow.fromWebContents(event.sender)
+    new ShareMenu({ filePaths: [filePath] }).popup({ window })
+  })
+}
+
 function createWindow(url) {
-  const win = new BrowserWindow({ width: 1280, height: 800 })
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    webPreferences: { preload: path.join(__dirname, 'preload.js') },
+  })
   win.loadURL(url)
+  handleSharePdf(url)
 
   // Open target="_blank" links in the user's browser, not a new app window.
   win.webContents.setWindowOpenHandler(({ url: target }) => {
@@ -112,4 +158,5 @@ if (!app.requestSingleInstanceLock()) {
   // The backend lives in this process, so closing the window ends the app on
   // every platform (including macOS).
   app.on('window-all-closed', () => app.quit())
+  app.on('will-quit', clearShareDir)
 }
