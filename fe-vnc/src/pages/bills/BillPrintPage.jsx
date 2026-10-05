@@ -440,10 +440,12 @@ function ItemsTable({ items }) {
   )
 }
 
-function BillDocument({ bill, company }) {
+// Also drawn off-screen on the bills list, to make the WhatsApp PDF.
+export function BillDocument({ bill, company, ref }) {
   return (
     // On screen this is drawn as an A4 sheet, so it looks the same as on paper.
     <Box
+      ref={ref}
       sx={{
         boxSizing: 'border-box',
         width: PAGE_WIDTH,

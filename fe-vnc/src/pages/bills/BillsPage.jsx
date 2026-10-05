@@ -3,6 +3,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router'
 import {
   Box,
   Button,
+  CircularProgress,
   Fade,
   Snackbar,
   Stack,
@@ -14,6 +15,7 @@ import DeleteOutlined from '@mui/icons-material/DeleteOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
+import WhatsApp from '@mui/icons-material/WhatsApp'
 import { useBills } from '../../api/bills.js'
 import { usePeopleOptions } from '../../api/users.js'
 import DataTable from '../../components/table/DataTable.jsx'
@@ -24,6 +26,7 @@ import { useDebouncedValue } from '../../lib/useDebouncedValue.js'
 import DeleteBillDialog from './DeleteBillDialog.jsx'
 import OptionPicker from './OptionPicker.jsx'
 import { formatMoney } from './billForm.js'
+import { useShareBill } from './useShareBill.jsx'
 
 const NEW_BILL_PATH = '/commission-bills/new'
 // bill_date is a date-only value stored at UTC midnight, so show it in UTC.
@@ -70,6 +73,8 @@ function BillsPage() {
   })
   // The form page sends a notice back after saving.
   const [notice, setNotice] = useState(location.state?.notice ?? '')
+  // Optional { label, onClick } button on the notice.
+  const [noticeAction, setNoticeAction] = useState(null)
 
   // Clear that notice from history so a refresh doesn't show it again.
   useEffect(() => {
@@ -109,6 +114,12 @@ function BillsPage() {
     setFrom('')
     setTo('')
   }
+
+  const showNotice = (message, action = null) => {
+    setNotice(message)
+    setNoticeAction(action)
+  }
+  const { shareBill, sharingBillId, snapshot } = useShareBill(showNotice)
 
   const openDelete = (bill) =>
     setDeleteDialog((d) => ({ open: true, bill, key: d.key + 1 }))
@@ -220,7 +231,7 @@ function BillsPage() {
           pagination={pagination}
           onPaginationChange={setPagination}
           rowCount={total}
-          actionsSize={136}
+          actionsSize={172}
           filters={
             <>
               <TableSearchField
@@ -267,6 +278,19 @@ function BillsPage() {
                     'noopener',
                   )
                 }
+              />
+              <RowActionButton
+                title="Share on WhatsApp"
+                label={`Share bill ${row.original.id} on WhatsApp`}
+                icon={
+                  sharingBillId === row.original.id ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <WhatsApp fontSize="small" />
+                  )
+                }
+                disabled={sharingBillId != null}
+                onClick={() => shareBill(row.original.id)}
               />
               <RowActionButton
                 title="Edit"
@@ -333,12 +357,29 @@ function BillsPage() {
           }}
         />
 
+        {snapshot}
+
         <Snackbar
           open={Boolean(notice)}
-          autoHideDuration={3000}
+          // Give time to read the steps and press the button.
+          autoHideDuration={noticeAction ? 8000 : 3000}
           onClose={() => setNotice('')}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           message={notice}
+          action={
+            noticeAction && (
+              <Button
+                color="secondary"
+                size="small"
+                onClick={() => {
+                  setNotice('')
+                  noticeAction.onClick()
+                }}
+              >
+                {noticeAction.label}
+              </Button>
+            )
+          }
         />
       </Stack>
     </Fade>
