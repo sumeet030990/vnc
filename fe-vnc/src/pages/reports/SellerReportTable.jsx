@@ -34,20 +34,19 @@ const SELLER_COLUMNS = [
   { label: 'Commission', numeric: true },
 ]
 
-const tdsColumns = () => [
+const TDS_COLUMNS = [
   ...LEAD_COLUMNS,
   { label: 'Amount', numeric: true },
-  {
-    label: 'TDS Amount',
-    numeric: true,
-  },
+  { label: 'Commission', numeric: true },
+  { label: 'TDS Amount', numeric: true },
 ]
 
 // One row per item the seller sold, with the buyer it went to.
-// With `tds` set, only money is shown: the amount and the TDS on it.
+// With `tds` set, only money is shown: the amount, the seller commission
+// and the TDS on that commission.
 function SellerReportTable({ items, totals, tds = false, tdsPercent }) {
   return (
-    <ReportTable columns={tds ? tdsColumns(tdsPercent) : SELLER_COLUMNS}>
+    <ReportTable columns={tds ? TDS_COLUMNS : SELLER_COLUMNS}>
       {items.map((item, index) => (
         <TableRow
           key={item.id}
@@ -82,12 +81,13 @@ function SellerReportTable({ items, totals, tds = false, tdsPercent }) {
             {formatMoney(item.amount)}
           </TableCell>
           <TableCell align="right" sx={numericCell}>
-            {formatMoney(
-              tds
-                ? tdsAmount(item.amount, tdsPercent)
-                : item.seller_commision_amount,
-            )}
+            {formatMoney(item.seller_commision_amount)}
           </TableCell>
+          {tds && (
+            <TableCell align="right" sx={numericCell}>
+              {formatMoney(tdsAmount(item.seller_commision_amount, tdsPercent))}
+            </TableCell>
+          )}
         </TableRow>
       ))}
       <TotalsRow>
@@ -110,10 +110,13 @@ function SellerReportTable({ items, totals, tds = false, tdsPercent }) {
           {formatMoney(totals.amount)}
         </TableCell>
         <TableCell align="right" sx={numericCell}>
-          {formatMoney(
-            tds ? totals.tds_amount : totals.seller_commision_amount,
-          )}
+          {formatMoney(totals.seller_commision_amount)}
         </TableCell>
+        {tds && (
+          <TableCell align="right" sx={numericCell}>
+            {formatMoney(totals.tds_amount)}
+          </TableCell>
+        )}
       </TotalsRow>
     </ReportTable>
   )

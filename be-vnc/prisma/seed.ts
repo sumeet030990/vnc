@@ -69,30 +69,6 @@ const users = [
     user_name: 'ayush',
     password: 'password',
   },
-  {
-    roleSlug: 'buyer',
-    name: 'Demo Buyer',
-    primary_mobile_no: '9000000004',
-    address: '2 Sample Street',
-    city: 'Nagpur',
-    allow_login: false,
-  },
-  {
-    roleSlug: 'seller',
-    name: 'Dayalu Dall Mill',
-    primary_mobile_no: '9000000005',
-    address: '',
-    city: 'Nagpur',
-    allow_login: false,
-  },
-  {
-    roleSlug: 'transporter',
-    name: 'Pathak',
-    primary_mobile_no: '9000000006',
-    address: '',
-    city: 'Nagpur',
-    allow_login: false,
-  },
 ]
 
 async function main() {

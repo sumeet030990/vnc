@@ -54,7 +54,7 @@ const PAGES = {
     roles: ['seller'],
     pickerLabel: 'Seller',
     reportTitle: () => 'TDS report',
-    // Only money: the amount and the TDS on it (main company's TDS %).
+    // Only money: amount, seller commission and the TDS on it (main company's TDS %).
     tds: true,
   },
 }
@@ -204,7 +204,8 @@ function ReportBody({ type, title, tds, tdsPercent, report, from, to }) {
       ? {
           ...report.totals,
           tds_amount: report.items.reduce(
-            (sum, item) => sum + tdsAmount(item.amount, tdsPercent),
+            (sum, item) =>
+              sum + tdsAmount(item.seller_commision_amount, tdsPercent),
             0,
           ),
         }
@@ -214,7 +215,22 @@ function ReportBody({ type, title, tds, tdsPercent, report, from, to }) {
     ? [
         { label: 'Bills', value: formatCount(totals.bills) },
         { label: 'Amount', value: formatMoney(totals.amount) },
+        {
+          label: 'Commission',
+          value: formatMoney(totals.seller_commision_amount),
+        },
         { label: 'TDS', value: formatMoney(totals.tds_amount) },
+        // What the seller is paid: commission minus TDS, rounded to paise.
+        {
+          label: 'Final Payment',
+          value: formatMoney(
+            totals.tds_amount == null
+              ? null
+              : Math.round(
+                  (totals.seller_commision_amount - totals.tds_amount) * 100,
+                ) / 100,
+          ),
+        },
       ]
     : [
         { label: 'Bills', value: formatCount(totals.bills) },

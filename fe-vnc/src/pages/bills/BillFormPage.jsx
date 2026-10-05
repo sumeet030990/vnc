@@ -184,6 +184,7 @@ function BillForm({ bill }) {
   const itemsTotal = sumBy(rows, 'amount')
   const additionalExpense =
     toNumber(formik.values.freight) +
+    toNumber(formik.values.buyer_commision_amount) +
     toNumber(formik.values.lorry_brokerage) -
     toNumber(formik.values.advance_freight)
 
