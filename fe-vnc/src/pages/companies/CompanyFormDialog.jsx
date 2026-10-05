@@ -52,6 +52,14 @@ const percentage = (label) =>
     .min(0, `${label} cannot be negative`)
     .max(100, `${label} must be 100 or less`)
 
+// Commission is rupees per quintal, so there is no upper limit.
+const perQuintal = (label) =>
+  yup
+    .number()
+    .transform((value, original) => (original === '' ? undefined : value))
+    .typeError(`${label} must be a number`)
+    .min(0, `${label} cannot be negative`)
+
 const schema = yup.object({
   name: optionalText('Name').required('Please enter a name'),
   primary_mobile_no: mobileNo('Primary mobile number'),
@@ -82,8 +90,8 @@ const schema = yup.object({
       message: 'PAN number must be 5 letters, 4 digits, then 1 letter',
       excludeEmptyString: true,
     }),
-  seller_commision_percentage: percentage('Seller commission'),
-  buyer_commision_percentage: percentage('Buyer commission'),
+  seller_commision_per_qtl: perQuintal('Seller commission'),
+  buyer_commision_per_qtl: perQuintal('Buyer commission'),
   tds_percentage: percentage('TDS'),
 })
 
@@ -101,8 +109,8 @@ const TEXT_FIELDS = [
   'pan_number',
 ]
 const PERCENT_FIELDS = [
-  'seller_commision_percentage',
-  'buyer_commision_percentage',
+  'seller_commision_per_qtl',
+  'buyer_commision_per_qtl',
   'tds_percentage',
 ]
 
@@ -153,6 +161,14 @@ function SectionLabel({ children }) {
 const percentSlotProps = {
   input: { endAdornment: <InputAdornment position="end">%</InputAdornment> },
   htmlInput: { min: 0, max: 100, step: 0.01, inputMode: 'decimal' },
+}
+// Commission is stored in rupees per quintal.
+const perQuintalSlotProps = {
+  input: {
+    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+    endAdornment: <InputAdornment position="end">/qtl</InputAdornment>,
+  },
+  htmlInput: { min: 0, step: 0.01, inputMode: 'decimal' },
 }
 
 // Mount a fresh copy per open (use a `key`) so the form resets each time.
@@ -339,18 +355,18 @@ function CompanyFormDialog({ open, company, onClose, onSaved }) {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                {...fieldProps('seller_commision_percentage')}
+                {...fieldProps('seller_commision_per_qtl')}
                 label="Seller commission"
                 type="number"
-                slotProps={percentSlotProps}
+                slotProps={perQuintalSlotProps}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                {...fieldProps('buyer_commision_percentage')}
+                {...fieldProps('buyer_commision_per_qtl')}
                 label="Buyer commission"
                 type="number"
-                slotProps={percentSlotProps}
+                slotProps={perQuintalSlotProps}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>

@@ -19,6 +19,8 @@ const SEARCH_FIELDS = [
 ]
 
 const formatPercent = (value) => (value == null ? '—' : `${value}%`)
+// Commission is stored in rupees per quintal.
+const formatPerQuintal = (value) => (value == null ? '—' : `₹${value}/qtl`)
 
 // GST and PAN on one line under the name, e.g. "GST 27AAA… · PAN ABCDE1234F".
 const taxIds = (company) =>
@@ -133,14 +135,19 @@ function CompaniesPage() {
         Cell: ({ cell }) => <MutedCell value={cell.getValue()} />,
       },
       {
-        id: 'commission',
-        header: 'Commission (seller / buyer)',
-        size: 200,
-        enableSorting: false,
-        Cell: ({ row }) => (
-          <MutedCell
-            value={`${formatPercent(row.original.seller_commision_percentage)} / ${formatPercent(row.original.buyer_commision_percentage)}`}
-          />
+        accessorKey: 'seller_commision_per_qtl',
+        header: 'Seller commission',
+        size: 160,
+        Cell: ({ cell }) => (
+          <MutedCell value={formatPerQuintal(cell.getValue())} />
+        ),
+      },
+      {
+        accessorKey: 'buyer_commision_per_qtl',
+        header: 'Buyer commission',
+        size: 160,
+        Cell: ({ cell }) => (
+          <MutedCell value={formatPerQuintal(cell.getValue())} />
         ),
       },
       {

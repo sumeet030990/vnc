@@ -62,6 +62,13 @@ const percentage = (label: string) =>
     .max(100, { error: `${label} must be 100 or less` })
     .nullable()
 
+// Commission is rupees per quintal, so there is no upper limit.
+const perQuintal = (label: string) =>
+  z
+    .number({ error: `${label} must be a number` })
+    .min(0, { error: `${label} cannot be negative` })
+    .nullable()
+
 export const companyIdParamsSchema = z.object({
   id: z.coerce
     .number({ error: 'Company id must be a number' })
@@ -82,8 +89,8 @@ export const replaceCompanySchema = z.object({
   state: optionalText('State'),
   gst_number: gstNumber,
   pan_number: panNumber,
-  seller_commision_percentage: percentage('Seller commission percentage'),
-  buyer_commision_percentage: percentage('Buyer commission percentage'),
+  seller_commision_per_qtl: perQuintal('Seller commission'),
+  buyer_commision_per_qtl: perQuintal('Buyer commission'),
   tds_percentage: percentage('TDS percentage'),
 })
 

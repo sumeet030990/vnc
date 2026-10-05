@@ -113,10 +113,6 @@ const textOrNull = (value) => value.trim() || null
 export const sumBy = (rows, field) =>
   rows.reduce((total, row) => total + toNumber(row[field]), 0)
 
-// Commission in rupees per quintal of weight.
-const SELLER_COMMISSION_RATE = 25
-const BUYER_COMMISSION_RATE = 20
-
 // A typed value as a number, or null when blank or not a number.
 const filled = (value) => {
   const parsed = Number(value)
@@ -132,7 +128,8 @@ const product = (a, b) => (a == null || b == null ? null : a * b)
 // Fills in the worked-out values after `field` changes on a row.
 // Amount and commission are only recalculated when their inputs change,
 // so a hand-typed amount stays until bags, packing, weight or rate change.
-export const recalcBillItem = (row, field) => {
+// `sellerRate` is the company's seller commission in rupees per quintal.
+export const recalcBillItem = (row, field, sellerRate) => {
   const next = { ...row }
   if (field === 'quantity_bags' || field === 'packaging') {
     // Weight in quintals: bags × packing (kg per bag) / 100.
@@ -142,17 +139,16 @@ export const recalcBillItem = (row, field) => {
   if (['quantity_bags', 'packaging', 'weight', 'souda_rate'].includes(field)) {
     const weight = filled(next.weight)
     next.amount = toMoneyText(product(weight, filled(next.souda_rate)))
-    next.seller_commision_amount = toMoneyText(
-      product(weight, SELLER_COMMISSION_RATE),
-    )
+    next.seller_commision_amount = toMoneyText(product(weight, sellerRate))
   }
   return next
 }
 
 // Buyer commission comes from the total weight of all rows.
-export const buyerCommissionFor = (rows) =>
-  rows.some((row) => filled(row.weight) != null)
-    ? toMoneyText(sumBy(rows, 'weight') * BUYER_COMMISSION_RATE)
+// `buyerRate` is the company's buyer commission in rupees per quintal.
+export const buyerCommissionFor = (rows, buyerRate) =>
+  buyerRate != null && rows.some((row) => filled(row.weight) != null)
+    ? toMoneyText(sumBy(rows, 'weight') * buyerRate)
     : ''
 
 // Every field is sent, so the same body works for POST and PUT.

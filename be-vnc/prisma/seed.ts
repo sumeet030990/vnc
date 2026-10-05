@@ -21,8 +21,8 @@ const companies = [
     pin_code: '440001',
     city: 'Nagpur',
     state: 'Maharashtra',
-    seller_commision_percentage: 1,
-    buyer_commision_percentage: 1,
+    seller_commision_per_qtl: 1,
+    buyer_commision_per_qtl: 1,
     tds_percentage: 0.1,
   },
 ]

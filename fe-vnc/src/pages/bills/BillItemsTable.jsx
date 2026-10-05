@@ -14,6 +14,7 @@ import {
 import { alpha } from '@mui/material/styles'
 import Add from '@mui/icons-material/Add'
 import Close from '@mui/icons-material/Close'
+import { MAIN_COMPANY_ID, useCompany } from '../../api/companies.js'
 import { useItems } from '../../api/items.js'
 import { useUserOptions } from '../../api/users.js'
 import OptionPicker from './OptionPicker.jsx'
@@ -120,6 +121,10 @@ function TotalCell({ children }) {
 function BillItemsTable({ formik }) {
   const sellers = useUserOptions('seller')
   const items = useItems()
+  const company = useCompany(MAIN_COMPANY_ID)
+  // Commission rates (₹ per quintal) are set on the main company.
+  const sellerRate = company.data?.seller_commision_per_qtl
+  const buyerRate = company.data?.buyer_commision_per_qtl
   const rows = formik.values.bill_items
   // The wide table needs a laptop screen; smaller screens get cards.
   const isMobile = useMediaQuery((t) => t.breakpoints.down('md'), {
@@ -146,7 +151,7 @@ function BillItemsTable({ formik }) {
     formik.setValues({
       ...formik.values,
       bill_items: nextRows,
-      buyer_commision_amount: buyerCommissionFor(nextRows),
+      buyer_commision_amount: buyerCommissionFor(nextRows, buyerRate),
     })
   }
 
@@ -155,6 +160,7 @@ function BillItemsTable({ formik }) {
     const row = recalcBillItem(
       { ...rows[index], [field]: event.target.value },
       field,
+      sellerRate,
     )
     const nextRows = rows.map((r, i) => (i === index ? row : r))
     formik.setValues({
@@ -163,7 +169,7 @@ function BillItemsTable({ formik }) {
       // Only touch buyer commission when the weight moved, so a hand-typed
       // value survives edits to rate or amount.
       ...(row.weight !== rows[index].weight && {
-        buyer_commision_amount: buyerCommissionFor(nextRows),
+        buyer_commision_amount: buyerCommissionFor(nextRows, buyerRate),
       }),
     })
   }
